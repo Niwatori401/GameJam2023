@@ -1,0 +1,3 @@
+bombs=20
+mapWidth=3
+mapHeight=7
