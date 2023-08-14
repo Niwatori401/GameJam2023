@@ -3,7 +3,7 @@ luac.out
 
 .vscode/*
 
-
+raw_materials/**
 # luarocks build files
 *.src.rock
 *.zip
