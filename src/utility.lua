@@ -1,4 +1,5 @@
-function sleep(time_seconds)
+utility = {}
+utility.sleep = function (time_seconds)
     if (love.system.getOS() == "Windows") then
         os.execute("timeout /t " .. time_seconds)
     else
@@ -7,7 +8,7 @@ function sleep(time_seconds)
 end
 
 
-function load_text(relative_path)
+utility.load_text = function (relative_path)
     local text = {}
 
     for line in love.filesystem.lines(relative_path) do
@@ -17,7 +18,7 @@ function load_text(relative_path)
     return text
 end
 
-function parse_info(text_lines)
+utility.parse_info = function (text_lines)
     local result = {}
 
     for _, line in pairs(text_lines) do
@@ -31,6 +32,6 @@ function parse_info(text_lines)
     return result
 end
 
-function load_image(relative_path)
+utility.load_image = function (relative_path)
     return love.graphics.newImage(relative_path)
 end

@@ -14,3 +14,18 @@ window.SCREEN_RATIO = 3/8
 
 game = {}
 game.game_time = 0
+
+font = {}
+font.init = function (self)
+    if self.initialized ~= nil and self.initialized == true then
+        print("Didnt init")
+        return
+    end
+
+    self.initialized = true
+
+    self.fonts = {}
+    self.fonts["ArchitectsDaughter"] = love.graphics.newFont("data/_meta/_fonts/ArchitectsDaughter.ttf")
+    self.fonts["Graziano"] = love.graphics.newFont("data/_meta/_fonts/Graziano.ttf")
+    self.fonts["Nicolas_Frespech"] = love.graphics.newFont("data/_meta/_fonts/Nicolas_Frespech.ttf")
+end

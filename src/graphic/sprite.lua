@@ -2,7 +2,7 @@
 sprite = {}
 
 
----@param image drawable
+---@param image love.Image
 ---@param x number
 ---@param y number
 ---@param scale_x number
