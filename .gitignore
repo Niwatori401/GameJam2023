@@ -42,3 +42,4 @@ raw_materials/**
 *.x86_64
 *.hex
 
+.luarc.jason

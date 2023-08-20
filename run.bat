@@ -1,2 +1,6 @@
+@echo off
+SET PARENT_DIR=%~p0
+SET PARENT_DIR=%PARENT_DIR:~0,-1%
+FOR %%i IN (%PARENT_DIR%) DO SET PARENT_NAME=%%~nxi
 cd ..
-START .\love.exe MineSweeperPrototype\
+START .\love.exe %PARENT_DIR%\src\
