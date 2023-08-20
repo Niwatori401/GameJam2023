@@ -7,6 +7,14 @@ local animation = require("graphic.animation")
 local character = {}
 character.__index = character
 
+
+
+---@param name string | nil
+---@param sprite sprite
+---@param images table table of images, indexed by normal indices
+---@param stages table array of stage numbers from lowest to highest, indexed by normal indices
+---@param cur_weight number | nil
+---@return character
 function character:new(name, sprite, images, stages, cur_weight)
     local new_character = {}
     setmetatable(new_character, self)
@@ -25,7 +33,7 @@ end
 
 ---Characters sprites are defined to be the size of the whole screen, though most should be mostly transparent.
 function character:draw(layer)
-    s = self.character_sprite
+    local s = self.character_sprite
 
     if layer == s.layer then
         love.graphics.setColor(s.color)
@@ -97,13 +105,13 @@ end
 ---@return integer
 function character:_get_cur_image_stage_index()
 
-    if self.cur_weight > self.stages[#self.stages] then
+    if self.cur_weight >= tonumber(self.stages[#self.stages]) then
         return #self.stages
     end
 
-    local cur_stage_index = self.stages[1]
+    local cur_stage_index = 1
     for index, weight in ipairs(self.stages) do
-        if self.cur_weight < weight then
+        if self.cur_weight < tonumber(weight) then
             break
         end
 

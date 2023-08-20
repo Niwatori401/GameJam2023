@@ -21,6 +21,7 @@ function defaults:init()
     self.initialized = true
 
     defaults.missing_image = love.graphics.newImage("data/_meta/default.png")
+    defaults.black_image = love.graphics.newImage("data/_meta/black.png")
 end
 
 local game = {}
@@ -33,6 +34,7 @@ function font:init()
     end
 
     self.initialized = true
+
 
     self.fonts = {}
     self.fonts["ArchitectsDaughter"] = love.graphics.newFont("data/_meta/_fonts/ArchitectsDaughter.ttf")
