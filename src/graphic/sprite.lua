@@ -1,6 +1,7 @@
 
+---@class sprite
 sprite = {}
-
+sprite.__index = sprite
 
 ---@param image love.Image
 ---@param x number
@@ -11,7 +12,7 @@ sprite = {}
 ---@param rotation number
 ---@param color table In format {R,G,B,A}
 ---@return table
-sprite.make_sprite = function (image, x, y, scale_x, scale_y, layer, rotation, color)
+function sprite:new(image, x, y, scale_x, scale_y, layer, rotation, color)
     local result = {}
 
     result.image = image
@@ -24,22 +25,18 @@ sprite.make_sprite = function (image, x, y, scale_x, scale_y, layer, rotation, c
     result.rotation = rotation
     result.color = color
 
-
     return result
 end
 
----@param sprite sprite
----@param animation animation
-sprite.add_animation_to_sprite = function (sprite, animation)
-    table.insert(sprite.animations, animation)
+
+function sprite:add_animation(animation)
+    table.insert(self.animations, animation)
 end
 
 
----@param sprite sprite
----@param cur_time number
-sprite.remove_stale_animations = function(sprite, cur_time)
+function sprite:remove_stale_animations(cur_time)
     local any_stale = false
-    for _, a in pairs(sprite.animations) do
+    for _, a in pairs(self.animations) do
         if (cur_time - a.start_time >= a.seconds_to_finish) then
             any_stale = true
             a.is_stale = true
@@ -51,11 +48,14 @@ sprite.remove_stale_animations = function(sprite, cur_time)
     end
 
     local new_animations
-    for _, a in pairs(sprite.animations) do
+    for _, a in pairs(self.animations) do
         if not a.is_stale then
             table.insert(new_animations, a)
         end
     end
 
-    sprite.animations = new_animations
+    self.animations = new_animations
 end
+
+
+return sprite
