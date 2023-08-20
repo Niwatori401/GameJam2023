@@ -1,2 +1,6 @@
-cd ..
-START .\love.exe MineSweeperPrototype\
+
+@echo off
+SET PARENT_DIR=%~p0
+SET PARENT_DIR=%PARENT_DIR:~0,-1%
+FOR %%i IN (%PARENT_DIR%) DO SET PARENT_NAME=%%~nxi
+START ..\love.exe %PARENT_DIR%\src\
