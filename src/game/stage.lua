@@ -90,29 +90,27 @@ end
 
 function stage:animation_fade_in()
 
-    table.insert(self.black_background.animations,
-        animation:new(
-            1,
-            0,
-            data.game.game_time,
-            2.0,
-            animation.scheme_linear_interpolate,
-            data.game.game_time,
-            4))
+    self.black_background:add_animation(animation:new(
+        1,
+        0,
+        data.game.game_time,
+        2.0,
+        animation.scheme_linear_interpolate,
+        data.game.game_time,
+        4))
 end
 
 
 function stage:animation_fade_out()
 
-    table.insert(self.black_background.animations,
-        animation:new(
-            0,
-            1,
-            data.game.game_time,
-            0.5,
-            animation.scheme_linear_interpolate,
-            data.game.game_time,
-            4))
+    self.black_background:add_animation(animation:new(
+        0,
+        1,
+        data.game.game_time,
+        0.5,
+        animation.scheme_linear_interpolate,
+        data.game.game_time,
+        4))
 end
 
 

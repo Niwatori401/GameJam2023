@@ -50,28 +50,26 @@ end
 
 ---Call to add an animation to the character sprites list
 function character:animation_enter_screen()
-    table.insert(self.character_sprite.animations,
-        animation:new(
-            data.window.SCREEN_Y,
-            0,
-            data.game.game_time,
-            0.5,
-            animation.scheme_linear_interpolate,
-            data.game.game_time,
-            "y"))
+    self.character_sprite:add_animation(animation:new(
+        data.window.SCREEN_Y,
+        0,
+        data.game.game_time,
+        0.5,
+        animation.scheme_linear_interpolate,
+        data.game.game_time,
+        "y"))
 end
 
 
 function character:animation_leave_screen()
-    table.insert(self.character_sprite.animations,
-        animation:new(
-            0,
-            data.window.SCREEN_Y,
-            data.game.game_time,
-            2.0,
-            animation.scheme_linear_interpolate,
-            data.game.game_time,
-            "y"))
+    self.character_sprite:add_animation(animation:new(
+        0,
+        data.window.SCREEN_Y,
+        data.game.game_time,
+        2.0,
+        animation.scheme_linear_interpolate,
+        data.game.game_time,
+        "y"))
 end
 
 

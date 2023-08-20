@@ -19,6 +19,7 @@ function animation:new(initial, final, start_time, seconds_to_finish, scheme, cu
     local result = {}
     setmetatable(result, self)
 
+    result.id = animation:get_new_id()
     result.initial = initial
     result.final = final
     result.start_time = start_time
@@ -31,6 +32,14 @@ function animation:new(initial, final, start_time, seconds_to_finish, scheme, cu
     return result
 end
 
+function animation:get_new_id()
+    if self.id_counter == nil then
+        self.id_counter = 0
+    end
+    self.id_counter = self.id_counter + 1
+
+    return self.id_counter
+end
 
 function animation:increment_animation()
     return self:scheme()
