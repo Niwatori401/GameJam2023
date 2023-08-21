@@ -35,3 +35,11 @@ end
 utility.load_image = function (relative_path)
     return love.graphics.newImage(relative_path)
 end
+
+utility.load_music = function (relative_path)
+    return love.audio.newSource(relative_path, "stream")
+end
+
+utility.load_sfx = function (relative_path)
+    return love.audio.newSource(relative_path, "static")
+end
