@@ -13,17 +13,18 @@ character.__index = character
 ---@param sprite sprite
 ---@param images table table of images, indexed by normal indices
 ---@param stages table array of stage numbers from lowest to highest, indexed by normal indices
----@param cur_weight number | nil
+---@param points number | nil
 ---@return character
-function character:new(name, sprite, images, stages, cur_weight)
+function character:new(name, sprite, images, stages, points)
     local new_character = {}
     setmetatable(new_character, self)
 
     new_character.name = name or "Pea Tear Griffin"
     new_character.images = images or data.defaults.missing_image
     new_character.stages = stages or {0}
-    new_character.cur_weight = cur_weight or 120
-
+    new_character.points = points or 120
+    new_character.max_points = 999999999
+    new_character.min_points = 0
     new_character.character_sprite = sprite
     new_character:update_sprite_image()
 
@@ -46,6 +47,19 @@ function character:draw(layer)
             s.y_scale * data.window.SCREEN_Y / s.image:getHeight()
         )
     end
+end
+
+function character:add_points(amount)
+
+    self.points = self.points + amount
+
+    if self.points < self.min_points then
+        self.points = self.min_points
+    elseif self.points > self.max_points then
+        self.points = max_points
+    end
+
+    self:update_sprite_image()
 end
 
 ---Call to add an animation to the character sprites list
@@ -103,13 +117,13 @@ end
 ---@return integer
 function character:_get_cur_image_stage_index()
 
-    if self.cur_weight >= tonumber(self.stages[#self.stages]) then
+    if self.points >= tonumber(self.stages[#self.stages]) then
         return #self.stages
     end
 
     local cur_stage_index = 1
     for index, weight in ipairs(self.stages) do
-        if self.cur_weight < tonumber(weight) then
+        if self.points < tonumber(weight) then
             break
         end
 

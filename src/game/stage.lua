@@ -24,7 +24,7 @@ function stage:new(stage_background)
         1,
         render_layer.EFFECTS,
         0,
-        {1,1,1,0.9})
+        {1,1,1,1})
 
     new_stage.stage_background = stage_background
 

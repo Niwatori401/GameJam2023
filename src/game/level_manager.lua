@@ -1,6 +1,7 @@
 local character = require("game.character")
 local data = require("data")
 local level = require("game.level")
+local music_set = require("sound.music_set")
 local sprite = require("graphic.sprite")
 local render_layers = require("graphic.render_layer")
 local stage = require("game.stage")
@@ -36,6 +37,23 @@ function level_manager:load_level(name)
     -- end
 
 
+    do
+        local music = {}
+        local stages = {}
+
+        local text = utility.load_text("data/" .. name .. "/stage/audio/audio_info.txt")
+        for i = 1, #text do
+            local line = text[i]
+            local playable = utility.load_music("data/" .. name .. "/stage/audio/" .. line .. ".ogg")
+            table.insert(stages, line)
+            table.insert(music, playable)
+        end
+
+
+        new_level.music = music_set:new(stages, music)
+    end
+
+
 
     -- Load stage
     do
@@ -65,7 +83,7 @@ function level_manager:load_level(name)
         new_level.character = character:new(nil, sprite, images, stages, nil)
     end
 
-    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, nil, nil)
+    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, nil, new_level.music)
 
 end
 

@@ -85,7 +85,6 @@ function sprite:remove_duplicate_animations(cur_time, animation)
     local new_animations = {}
     for _, a in pairs(self.animations) do
         if not a.is_stale then
-            print(new_animations)
             table.insert(new_animations, a)
         end
     end
