@@ -1,10 +1,12 @@
 require("utility")
+local machine = require("game.machine")
 local data = require("data")
 local sprite_renderer = require("graphic.sprite_renderer")
 local level_manager = require("game.level_manager")
 local music_set = require("sound.music_set")
 
 function love.load()
+    machine:init("start")
     data:init()
     sprite_renderer:init()
     level_manager:load_level("texas")
