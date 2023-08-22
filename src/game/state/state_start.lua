@@ -3,7 +3,7 @@
     File: state_empty.lua
     Descriptions: implments an empty state
 --]]
-local state = require("src.game.state.state")
+local state = require("game.state.state")
 
 ---@class start_state
 local start_state = {}

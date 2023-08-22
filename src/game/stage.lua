@@ -88,7 +88,7 @@ function stage:_update_all_animations_for_sprite(s, cur_time)
 end
 
 
-function stage:animation_fade_in()
+function stage:animation_fade_in(duration, callback)
 
     self.black_background:add_animation(animation:new(
         1,
@@ -96,20 +96,18 @@ function stage:animation_fade_in()
         data.game.game_time,
         2.0,
         animation.scheme_linear_interpolate,
-        data.game.game_time,
         4))
 end
 
 
-function stage:animation_fade_out()
+function stage:animation_fade_out(duration, callback)
 
     self.black_background:add_animation(animation:new(
         0,
         1,
         data.game.game_time,
-        0.5,
+        duration,
         animation.scheme_linear_interpolate,
-        data.game.game_time,
         4))
 end
 

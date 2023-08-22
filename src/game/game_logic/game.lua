@@ -1,4 +1,4 @@
-local action_set = require("game.level.action_set")
+local action_set = require("game.action_set")
 
 
 local game = {}
@@ -8,10 +8,7 @@ function game:new(data)
 
     new_game.action_set = action_set:new()
 
-    new_game.action_set:add_key_action("r", function (level)
-        --level.level_manager:load_level("_main_menu")
-    end)
-
+    return new_game
 end
 
 function game:update()

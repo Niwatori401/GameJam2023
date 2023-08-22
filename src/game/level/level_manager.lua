@@ -1,6 +1,6 @@
 local character = require("game.character")
 local data = require("data")
-local level = require("src.game.level.level")
+local level = require("game.level.level")
 local music_set = require("sound.music_set")
 local sprite = require("graphic.sprite")
 local render_layers = require("graphic.render_layer")
@@ -116,7 +116,14 @@ function level_manager:load_level(name)
         new_level.character = character:new("", sprite:new(data.defaults.transparent, 0, 0, 0, 0, render_layers.CHARACTERS, 0, data.color.COLOR_CLEAR), {data.defaults.transparent}, {0}, 0)
     end
 
-    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, new_level.music, new_level.level_prototype, new_level.game_data)
+    level_manager.cur_level = level:new(
+        new_level.stage,
+        new_level.character,
+        nil,
+        new_level.music,
+        new_level.level_prototype,
+        new_level.game_data,
+        self)
 
 end
 

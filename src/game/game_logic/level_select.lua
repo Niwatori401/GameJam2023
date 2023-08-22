@@ -1,4 +1,5 @@
-local action_set = require("game.level.action_set")
+local action_set = require("game.action_set")
+local animation = require("graphic.animation")
 local data = require("data")
 local game = require("game.game_logic.game")
 local sprite = require("graphic.sprite")
@@ -22,6 +23,7 @@ function game_level_select:new(game_data)
     local level_id = 1
 
     for filename, levelpos in pairs(map_info) do
+
         local new_level = {}
         new_level.filename = filename
         new_level.title = level_info[filename]
@@ -34,8 +36,28 @@ function game_level_select:new(game_data)
         level_id = level_id + 1
     end
 
+    new_game.gun_shot = game_data.gun_shot
+    new_game.cock = game_data.cock
+
     new_game.selector_sprite = sprite:new(
-        game_data.select, 0, 0, 1, 1, render_layer.EFFECTS, 0, data.color.COLOR_WHITE)
+        game_data.select, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
+
+    local revolution_rate = 2
+    local seconds_to_animate = 3600
+
+    new_game.selector_sprite:add_animation(
+        animation:new(
+            0,
+            revolution_rate * seconds_to_animate * 2 * math.pi,
+            data.game.game_time,
+            seconds_to_animate,
+            animation.scheme_linear_interpolate,
+            "rotation")
+    )
+
+    new_game.dot_sprite = sprite:new(
+        game_data.dot, 0 ,0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE
+    )
 
     new_game.currently_selected_index = 1
 
@@ -44,16 +66,19 @@ function game_level_select:new(game_data)
     new_game.action_set = action_set:new()
 
     new_game.action_set:add_key_action("left", function (game)
+        love.audio.play(game.cock)
         game.currently_selected_index = ((game.currently_selected_index) % #game.level_data) + 1
     end)
 
 
     new_game.action_set:add_key_action("right", function (game)
+        love.audio.play(game.cock)
         game.currently_selected_index = ((game.currently_selected_index - 2) % #game.level_data) + 1
     end)
 
 
     new_game.action_set:add_key_action("return", function (game)
+        love.audio.play(game.gun_shot)
 
     end)
 
@@ -72,11 +97,45 @@ function game_level_select:update(dt)
 
     self.selector_sprite.x = level_data.pos_x
     self.selector_sprite.y = level_data.pos_y
+    self.selector_sprite.rotation = self.selector_sprite.animations[1]:increment_animation(cur_time)
 end
 
 
 function game_level_select:draw(layer)
     local s = self.selector_sprite
+    if layer == render_layer.GAME_BG then
+        love.graphics.setColor(data.color.COLOR_WHITE)
+        local max_width = 100
+        local font_scale = 1.3
+        local drop_shadow_offset = 1
+
+
+        love.graphics.printf(
+            self.level_data[self.currently_selected_index].title,
+            data.font.fonts["Crosterian"],
+            s.x + drop_shadow_offset,
+            s.y - 50 + drop_shadow_offset,
+            max_width,
+            "center",
+            0,
+            font_scale,
+            font_scale,
+            max_width / 2,
+            0)
+        love.graphics.setColor(data.color.COLOR_BLACK)
+        love.graphics.printf(
+            self.level_data[self.currently_selected_index].title,
+            data.font.fonts["Crosterian"],
+            s.x,
+            s.y - 50,
+            max_width,
+            "center",
+            0,
+            font_scale,
+            font_scale,
+            max_width / 2,
+            0)
+    end
 
     if layer == s.layer then
         love.graphics.setColor(s.color)
@@ -91,6 +150,30 @@ function game_level_select:draw(layer)
             s.image:getHeight() / 2
         )
     end
+
+    s = self.dot_sprite
+
+    for _, country_data in pairs(self.level_data) do
+
+        local x = country_data.pos_x
+        local y = country_data.pos_y
+
+        if layer == s.layer then
+            love.graphics.setColor(s.color)
+            love.graphics.draw(
+                s.image,
+                x,
+                y,
+                s.rotation,
+                s.x_scale,
+                s.y_scale,
+                s.image:getWidth() / 2,
+                s.image:getHeight() / 2
+            )
+        end
+    end
+
+
 end
 
 function game_level_select:handle_events(key)

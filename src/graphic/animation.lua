@@ -13,9 +13,9 @@ animation.__index = animation
 ---@param seconds_to_finish number
 ---@param scheme function
 ---@param cur_time number
----@param property_to_animate string
+---@param property_to_animate string | integer
 ---@return table
-function animation:new(initial, final, start_time, seconds_to_finish, scheme, cur_time, property_to_animate)
+function animation:new(initial, final, start_time, seconds_to_finish, scheme, property_to_animate)
     local result = {}
     setmetatable(result, self)
 

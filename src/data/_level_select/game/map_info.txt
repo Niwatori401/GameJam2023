@@ -1,3 +1,3 @@
-texas=200 225
-tokyo=820 240
-delhi=690 260
+texas=155 215
+tokyo=863 230
+delhi=710 260
