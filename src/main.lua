@@ -9,7 +9,7 @@ function love.load()
     machine:init("start")
     data:init()
     sprite_renderer:init()
-    level_manager:load_level("texas")
+    level_manager:load_level("_level_select")
     love.graphics.setFont(data.font.fonts["ArchitectsDaughter"])
 
 
@@ -17,15 +17,14 @@ end
 
 function love.update(dt)
     data.game.game_time = data.game.game_time + dt
-    level_manager.cur_level.character:update_animations()
-    level_manager.cur_level.stage:update_animations()
+    level_manager.cur_level:update(dt)
     --level_manager.cur_level.music_set:update_audio()
 end
 
 function love.keypressed( key )
 
 
-    level_manager.cur_level.action_set:do_all_applicable_actions(key, level_manager.cur_level)
+    level_manager.cur_level:handle_events(key)
 
     if key == "space" then
         level_manager.cur_level.character:animation_enter_screen()

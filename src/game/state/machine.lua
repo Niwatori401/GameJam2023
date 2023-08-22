@@ -4,7 +4,7 @@
     refer to states
 --]]
 
-local states = require("game.state.state")
+local states = require("game.state.states")
 
 --#region Machine
 ---@class game_machine
