@@ -2,7 +2,7 @@ local animation = require("graphic.animation")
 local data = require("data")
 local character = require("game.character")
 local sprite = require("graphic.sprite")
-local level_manager = require("src.game.level.level_manager")
+local level_manager = require("game.level.level_manager")
 local render_layer = require("graphic.render_layer")
 
 
@@ -40,11 +40,12 @@ function sprite_renderer:render()
     -- 5
     level_manager.cur_level.character:draw(render_layer.CHARACTERS)
     -- 6
+    level_manager.cur_level.game:draw(render_layer.GAME_BG)
     -- 7
     -- 8
     -- 9
     level_manager.cur_level.stage:draw(render_layer.EFFECTS)
-    level_manager.cur_level.game:draw(render_layer.EFFECTS)
+
 end
 
 

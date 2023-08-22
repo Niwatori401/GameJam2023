@@ -70,7 +70,6 @@ function character:animation_enter_screen()
         data.game.game_time,
         0.5,
         animation.scheme_linear_interpolate,
-        data.game.game_time,
         "y"))
 end
 
@@ -82,7 +81,6 @@ function character:animation_leave_screen()
         data.game.game_time,
         2.0,
         animation.scheme_linear_interpolate,
-        data.game.game_time,
         "y"))
 end
 
