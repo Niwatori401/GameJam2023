@@ -1,20 +1,21 @@
 --[[
-    File: state_empty.lua
-    Descriptions: implments an empty state
+    File: state_start.lua
+    Descriptions: implments a start state
 --]]
-local state = require("src.game.state.state")
+local state = require("game.state.state")
 
 ---@class start_state
 local start_state = {}
 setmetatable(start_state, state)
 start_state.name = "start"
 
-function start_state:next_state(res)
+function start_state:state_next(res)
 
-    -- something
+    if res.act ~= nil then
+    
+    end
 
-    -- if nothing to change state in res, return self name
-    return self.name
+    return "load"
 end
 
 return start_state
