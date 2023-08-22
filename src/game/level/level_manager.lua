@@ -36,6 +36,34 @@ function level_manager:load_level(name)
     --     table.insert(new_sprites.stage_bg, sprite)
     -- end
 
+    do
+        local game_data_file_names = love.filesystem.getDirectoryItems("data/".. name .. "/game")
+
+        local game_data = {}
+
+        for _, filename in pairs(game_data_file_names) do
+            local cleaned_name = string.match(filename, "(.+)%..+")
+            if string.find(filename, "%.txt") then
+                game_data[cleaned_name] = utility.load_text("data/".. name .. "/game/" .. filename)
+            elseif string.find(filename, "%.ogg") then
+                game_data[cleaned_name] = utility.load_music("data/".. name .. "/game/" .. filename)
+            elseif string.find(filename, "%.png") then
+                game_data[cleaned_name] = utility.load_image("data/".. name .. "/game/" .. filename)
+            end
+        end
+
+        new_level.game_data = game_data
+    end
+
+
+    -- Load metadata
+    do
+        local lines = utility.load_text("data/" .. name .. "/meta")
+        local metadata = utility.parse_info(lines)
+        new_level.level_prototype = metadata.level_prototype
+
+    end
+
 
     if love.filesystem.getInfo( "data/" .. name .. "/stage/audio/audio_info.txt", "file" ) ~= nil then
 
@@ -88,7 +116,7 @@ function level_manager:load_level(name)
         new_level.character = character:new("", sprite:new(data.defaults.transparent, 0, 0, 0, 0, render_layers.CHARACTERS, 0, data.color.COLOR_CLEAR), {data.defaults.transparent}, {0}, 0)
     end
 
-    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, nil, new_level.music, self)
+    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, new_level.music, new_level.level_prototype, new_level.game_data)
 
 end
 

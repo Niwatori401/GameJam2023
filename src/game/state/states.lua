@@ -1,5 +1,5 @@
-local empty = require("game.states.state_empty")
-local start = require("game.states.state_start")
+local empty = require("game.state.state_empty")
+local start = require("game.state.state_start")
 
 local states = {}
 

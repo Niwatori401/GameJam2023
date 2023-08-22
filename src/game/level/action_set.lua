@@ -1,19 +1,19 @@
 
 
 
-local level_action_set = {}
-level_action_set.__index = level_action_set
+local action_set = {}
+action_set.__index = action_set
 
 
-function level_action_set:new()
+function action_set:new()
     local new_set = {}
-    setmetatable(new_set, level_action_set)
+    setmetatable(new_set, action_set)
     new_set.actions = {}
     return new_set
 end
 
 
-function level_action_set:add_key_action(key, action)
+function action_set:add_key_action(key, action)
     if self.actions[key] == nil then
         self.actions[key] = {}
     end
@@ -21,14 +21,14 @@ function level_action_set:add_key_action(key, action)
     table.insert(self.actions[key], action)
 end
 
-function level_action_set:do_all_applicable_actions(key, level)
+function action_set:do_all_applicable_actions(key, param)
     if self.actions[key] == nil then
         return
     end
 
     for _, action in pairs(self.actions[key]) do
-        action(level)
+        action(param)
     end
 end
 
-return level_action_set
+return action_set
