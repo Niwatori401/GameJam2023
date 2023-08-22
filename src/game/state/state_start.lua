@@ -1,4 +1,3 @@
-
 --[[
     File: state_empty.lua
     Descriptions: implments an empty state
