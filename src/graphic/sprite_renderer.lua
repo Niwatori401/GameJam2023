@@ -2,7 +2,7 @@ local animation = require("graphic.animation")
 local data = require("data")
 local character = require("game.character")
 local sprite = require("graphic.sprite")
-local level_manager = require("game.level_manager")
+local level_manager = require("src.game.level.level_manager")
 local render_layer = require("graphic.render_layer")
 
 

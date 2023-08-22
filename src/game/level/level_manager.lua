@@ -1,6 +1,6 @@
 local character = require("game.character")
 local data = require("data")
-local level = require("game.level")
+local level = require("src.game.level.level")
 local music_set = require("sound.music_set")
 local sprite = require("graphic.sprite")
 local render_layers = require("graphic.render_layer")
@@ -37,7 +37,8 @@ function level_manager:load_level(name)
     -- end
 
 
-    do
+    if love.filesystem.getInfo( "data/" .. name .. "/stage/audio/audio_info.txt", "file" ) ~= nil then
+
         local music = {}
         local stages = {}
 
@@ -49,8 +50,10 @@ function level_manager:load_level(name)
             table.insert(music, playable)
         end
 
-
         new_level.music = music_set:new(stages, music)
+
+    else
+        new_level.music = { 0, data.defaults.silence }
     end
 
 
@@ -64,7 +67,7 @@ function level_manager:load_level(name)
 
 
     -- Load character images
-    do
+    if love.filesystem.getInfo( "data/" .. name .. "/character/character_stage_info.txt", "file" ) ~= nil then
         local text = utility.load_text("data/" .. name .. "/character/character_stage_info.txt")
         images = {}
         stages = {}
@@ -81,9 +84,11 @@ function level_manager:load_level(name)
         local sprite = sprite:new(images[1], 0, 0, 1, 1, render_layers.CHARACTERS, 0, data.color.COLOR_WHITE)
 
         new_level.character = character:new(nil, sprite, images, stages, nil)
+    else
+        new_level.character = character:new("", sprite:new(data.defaults.transparent, 0, 0, 0, 0, render_layers.CHARACTERS, 0, data.color.COLOR_CLEAR), {data.defaults.transparent}, {0}, 0)
     end
 
-    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, nil, new_level.music)
+    level_manager.cur_level = level:new(new_level.stage, new_level.character, nil, nil, new_level.music, self)
 
 end
 

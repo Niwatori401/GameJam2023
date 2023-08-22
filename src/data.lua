@@ -19,9 +19,11 @@ function defaults:init()
         return
     end
     self.initialized = true
-
+    defaults.transparent = love.graphics.newImage("data/_meta/transparent.png")
     defaults.missing_image = love.graphics.newImage("data/_meta/default.png")
     defaults.black_image = love.graphics.newImage("data/_meta/black.png")
+
+    defaults.silent = love.audio.newSource("data/_meta/silence.ogg", "static")
 end
 
 local game = {}

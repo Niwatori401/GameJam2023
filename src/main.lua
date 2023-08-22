@@ -1,8 +1,8 @@
 require("utility")
-local machine = require("game.machine")
+local machine = require("src.game.state.machine")
 local data = require("data")
 local sprite_renderer = require("graphic.sprite_renderer")
-local level_manager = require("game.level_manager")
+local level_manager = require("src.game.level.level_manager")
 local music_set = require("sound.music_set")
 
 function love.load()
@@ -11,6 +11,8 @@ function love.load()
     sprite_renderer:init()
     level_manager:load_level("texas")
     love.graphics.setFont(data.font.fonts["ArchitectsDaughter"])
+
+
 end
 
 function love.update(dt)
@@ -21,6 +23,10 @@ function love.update(dt)
 end
 
 function love.keypressed( key )
+
+
+    level_manager.cur_level.action_set:do_all_applicable_actions(key, level_manager.cur_level)
+
     if key == "space" then
         level_manager.cur_level.character:animation_enter_screen()
     elseif key == "lshift" then
@@ -33,11 +39,11 @@ function love.keypressed( key )
         level_manager.cur_level.character:add_points(-50)
     end
 
-    if key == "u" then
-        level_manager:load_level("texas")
-    elseif key == "j" then
-        level_manager:load_level("tokyo")
-    end
+    -- if key == "u" then
+    --     level_manager:load_level("texas")
+    -- elseif key == "j" then
+    --     level_manager:load_level("tokyo")
+    -- end
 
     if key == "a" then
         level_manager.cur_level.stage:animation_fade_in()
@@ -47,7 +53,6 @@ function love.keypressed( key )
 end
 
 function love.draw()
-    love.graphics.print("test")
     sprite_renderer:render()
 end
 

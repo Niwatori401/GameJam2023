@@ -4,7 +4,7 @@
     refer to states
 --]]
 
-local states = require("game.states.states")
+local states = require("game.state.state")
 
 --#region Machine
 ---@class game_machine
@@ -18,7 +18,7 @@ game_machine.current_state = states.start
 ---@param start_state string
 function game_machine:init(start_state)
     self.current_state = states[start_state]
-    
+
 end
 
 function game_machine:run_single()
