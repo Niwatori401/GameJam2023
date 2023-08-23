@@ -103,7 +103,6 @@ function game_level_select:update(dt)
     self.selector_sprite.rotation = self.selector_sprite.animations[1]:increment_animation(cur_time)
 end
 
-
 function game_level_select:draw(layer)
     local s = self.selector_sprite
     if layer == render_layer.GAME_BG then

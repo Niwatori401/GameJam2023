@@ -29,11 +29,7 @@ function love.keypressed( key )
 
     level_manager.cur_level:handle_events(key)
 
-    if key == "space" then
-        level_manager.cur_level.character:animation_enter_screen()
-    elseif key == "lshift" then
-        level_manager.cur_level.character:animation_leave_screen()
-    end
+
 
     if key == "g" then
         level_manager.cur_level.character:add_points(50)

@@ -29,6 +29,7 @@ function music_set:play_stage(stage_number)
     self.cur_stage_index = stage_number
     self.audio[self.cur_stage_index]:seek(curtime)
     self.audio[self.cur_stage_index]:play()
+    self.audio[self.cur_stage_index]:setLooping(true)
 end
 
 function music_set:update_audio()

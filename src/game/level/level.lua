@@ -36,6 +36,7 @@ function level:new(stage, character, game_background, music_set, game_prototype,
     new_level.game.level = new_level
 
     new_level.stage:animation_fade_in(0.5)
+    new_level.character:animation_enter_screen()
 
     new_level.music_set:fade_in(2)
     love.audio.stop()
@@ -70,9 +71,10 @@ end
 function level:transition_out()
 
     if not self.flags.is_leaving then
-        self.flags.leaving_progress = 0.5
+        self.flags.leaving_progress = 1.5
         self.flags.is_leaving = true
-        self.stage:animation_fade_out(0.5)
+        self.character:animation_leave_screen()
+        self.stage:animation_fade_out(1)
     end
 end
 
