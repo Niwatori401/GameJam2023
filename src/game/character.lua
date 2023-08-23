@@ -88,7 +88,7 @@ end
 
 ---Used to check for the need to update the character sprite with a new image.
 function character:update_sprite_image()
-    self.character_sprite.image = self.images[self:_get_cur_image_stage_index()]
+    self.character_sprite.image = self.images[self:get_cur_image_stage_index()]
 end
 
 
@@ -113,7 +113,7 @@ end
 
 ---Gets the index of the sprites for the given character weight
 ---@return integer
-function character:_get_cur_image_stage_index()
+function character:get_cur_image_stage_index()
 
     if self.points >= tonumber(self.stages[#self.stages]) then
         return #self.stages

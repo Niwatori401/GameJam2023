@@ -50,7 +50,6 @@ end
 
 
 function level:handle_events(key)
-    --self.action_set:do_all_applicable_actions(key, self)
     self.game:handle_events(key)
 end
 

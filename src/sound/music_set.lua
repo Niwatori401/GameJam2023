@@ -41,8 +41,6 @@ function music_set:update_audio()
     end
 
     self.audio[self.cur_stage_index]:setVolume(self.volume)
-    --self.audio[self.cur_stage_index]:setPitch(self.pitch)
-    --self.audio[self.cur_stage_index]:setSpeed(self.speed)
 end
 
 function music_set:change_speed(speed, duration)

@@ -1,4 +1,7 @@
+local data = require("data")
 local game = require("game.game_logic.game")
+local sprite = require("graphic.sprite")
+local render_layer = require("graphic.render_layer")
 local action_set = require("game.action_set")
 
 local game_puzzle_bobble = {}
@@ -8,6 +11,20 @@ setmetatable(game_puzzle_bobble, {__index = game})
 function game_puzzle_bobble:new(game_data)
     local new_game = setmetatable({}, {__index = game_puzzle_bobble})
 
+    local game_width = 380
+    local game_height = 540
+    local game_x = 610
+    local game_y = 15
+    local game_bg_image = game_data["game_bg"]
+    new_game.game_bg = sprite:new(
+        game_bg_image,
+        game_x,
+        game_y,
+        game_width / game_bg_image:getWidth(),
+        game_height / game_bg_image:getHeight(),
+        render_layer.GAME_BG,
+        0,
+        data.color.COLOR_WHITE)
 
     new_game.action_set = action_set:new()
 
@@ -32,16 +49,26 @@ end
 
 function game_puzzle_bobble:update(dt)
 
-    -- local level_data = self.level_data[self.currently_selected_index]
-    -- self.selector_sprite.x = level_data.pos_x
-    -- self.selector_sprite.y = level_data.pos_y
-    -- self.selector_sprite.rotation = self.selector_sprite.animations[1]:increment_animation(cur_time)
+
 end
 
 
 function game_puzzle_bobble:draw(layer)
 
+    --new_game.game_bg
+    local s = self.game_bg
 
+    if layer == s.layer then
+        love.graphics.setColor(s.color)
+        love.graphics.draw(
+            s.image,
+            s.x,
+            s.y,
+            s.rotation,
+            s.x_scale,
+            s.y_scale
+        )
+    end
 end
 
 function game_puzzle_bobble:handle_events(key)
