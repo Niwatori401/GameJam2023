@@ -68,6 +68,16 @@ function level:update(dt)
     end
 end
 
+function level:add_points(pts)
+
+    self.character:add_points(pts)
+    local index = self.character:get_cur_image_stage_index()
+    if self.last_music_index ~= index then
+        self.music_set:play_stage(index)
+        self.last_music_index = index
+    end
+end
+
 function level:transition_out()
 
     if not self.flags.is_leaving then

@@ -32,9 +32,9 @@ function love.keypressed( key )
 
 
     if key == "g" then
-        level_manager.cur_level.character:add_points(50)
+        level_manager.cur_level:add_points(50)
     elseif key == "l" then
-        level_manager.cur_level.character:add_points(-50)
+        level_manager.cur_level:add_points(-50)
     end
 
 end
