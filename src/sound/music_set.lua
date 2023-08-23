@@ -23,9 +23,7 @@ end
 
 
 function music_set:play_stage(stage_number)
-    print("eee")
-    print(self.audio[self.cur_stage_index])
-    print("000")
+
     local curtime = self.audio[self.cur_stage_index]:tell()
     self.audio[self.cur_stage_index]:stop()
     self.cur_stage_index = stage_number
