@@ -64,7 +64,7 @@ function level_manager:load_level(name)
 
     end
 
-
+    -- Load music
     if love.filesystem.getInfo( "data/" .. name .. "/stage/audio/audio_info.txt", "file" ) ~= nil then
 
         local music = {}
@@ -81,7 +81,7 @@ function level_manager:load_level(name)
         new_level.music = music_set:new(stages, music)
 
     else
-        new_level.music = { 0, data.defaults.silence }
+        new_level.music = music_set:new({1}, {data.defaults.silence})
     end
 
 
@@ -123,7 +123,7 @@ function level_manager:load_level(name)
         new_level.music,
         new_level.level_prototype,
         new_level.game_data,
-        self)
+        name)
 
 end
 

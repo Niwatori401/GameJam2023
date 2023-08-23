@@ -18,21 +18,15 @@ game_machine.current_state = states.load
 ---@param start_state string
 function game_machine:init(start_state)
     self.current_state = states[start_state]
-
-end
-
-function game_machine:run_single()
-    self.state:run_state()
 end
 
 
--- makes the next state the current state, sets next state to the empty state
----@param res res ".act=actions to take: exit, repeat, next; .actval=additional value to pass with act"
-function game_machine:transition_state(res)
-    if res ~= nil then
-        self.state = self.states[self.state:next_state(res)]
-        self.state:load_state(res)
-        self.state:run_state()
+---Selects appropriate state to handle request, then processes request
+---@param request request
+function game_machine:transition_state(request)
+    if request ~= nil then
+        self.current_state = states[self.current_state:next_state(request)]
+        self.current_state:process_request(request)
     end
 end
 

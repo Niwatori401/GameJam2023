@@ -4,13 +4,16 @@ local data = require("data")
 local sprite_renderer = require("graphic.sprite_renderer")
 local level_manager = require("game.level.level_manager")
 local music_set = require("sound.music_set")
+local request = require("game.state.request")
 
 function love.load()
-    machine:init("start")
+
     data:init()
+    data.game.machine = machine
+    machine:init("base")
+    machine:transition_state(request:new(nil, "abort_level", nil))
     sprite_renderer:init()
-    level_manager:load_level("_level_select")
-    -- level_manager:load_level("texas")
+
     love.graphics.setFont(data.font.fonts["ArchitectsDaughter"])
 
 
@@ -19,7 +22,6 @@ end
 function love.update(dt)
     data.game.game_time = data.game.game_time + dt
     level_manager.cur_level:update(dt)
-    --level_manager.cur_level.music_set:update_audio()
 end
 
 function love.keypressed( key )
@@ -39,11 +41,6 @@ function love.keypressed( key )
         level_manager.cur_level.character:add_points(-50)
     end
 
-    if key == "a" then
-        level_manager.cur_level.stage:animation_fade_in(1)
-    elseif key == "s" then
-        level_manager.cur_level.stage:animation_fade_out(1)
-    end
 end
 
 function love.draw()

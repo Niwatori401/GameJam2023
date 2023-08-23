@@ -1,6 +1,6 @@
 local main_menu = require("game.game_logic.main_menu")
-local level_select = require("game.game_logic.level_select")
-local puzzle_bobble = require("game.game_logic.puzzle_bobble")
+local level_select = require("game.game_logic.game_level_select")
+local puzzle_bobble = require("game.game_logic.game_puzzle_bobble")
 
 
 local games = {}

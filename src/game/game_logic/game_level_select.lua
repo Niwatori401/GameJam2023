@@ -66,25 +66,28 @@ function game_level_select:new(game_data)
     new_game.action_set = action_set:new()
 
     new_game.action_set:add_key_action("left", function (game)
-        love.audio.play(game.cock)
+        game.cock:play()
         game.currently_selected_index = ((game.currently_selected_index) % #game.level_data) + 1
     end)
 
 
     new_game.action_set:add_key_action("right", function (game)
-        love.audio.play(game.cock)
+        game.cock:play()
         game.currently_selected_index = ((game.currently_selected_index - 2) % #game.level_data) + 1
     end)
 
 
     new_game.action_set:add_key_action("return", function (game)
-        love.audio.play(game.gun_shot)
-
+        game.gun_shot:play()
+        game.level.exit_status = "unconditional_load"
+        game.level.payload = {level_to_load = game.level_data[game.currently_selected_index].filename}
+        game.level:transition_out()
     end)
 
 
     new_game.action_set:add_key_action("escape", function (game)
-
+        game.level.exit_status = "abort_level"
+        game.level:transition_out()
     end)
 
     return new_game

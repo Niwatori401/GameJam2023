@@ -1,5 +1,7 @@
-local games = require "game.game_logic.games"
 local action_set = require("game.action_set")
+local data = require("data")
+local games = require("game.game_logic.games")
+local request = require("game.state.request")
 
 ---@class level
 local level = {}
@@ -12,30 +14,35 @@ level.__index = level
 ---@param music_set table table of music
 ---@param game_prototype string name of entry in games.lua
 ---@param game_data table collection of misc data for use by the game class defined by game_prototype
+---@param name string
 ---@return level
-function level:new(stage, character, game_background, music_set, game_prototype, game_data, level_manager)
+function level:new(stage, character, game_background, music_set, game_prototype, game_data, name)
 
     local new_level = {}
-    setmetatable(new_level, self)
+    setmetatable(new_level, level)
 
+    new_level.name = name
     new_level.stage = stage
+
     new_level.character = character
     new_level.game_background = game_background
     new_level.music_set = music_set
-    new_level.action_set = action_set:new()
-    new_level.action_set:add_key_action("return", function (level)
-        level:transition_out()
-    end)
+
 
     new_level.flags = {}
     new_level.flags.is_leaving = false
 
     new_level.game = games[game_prototype]:new(game_data)
-    new_level.level_manager = level_manager
+    new_level.game.level = new_level
 
     new_level.stage:animation_fade_in(0.5)
 
-    new_level.level_manager = level_manager
+    new_level.music_set:fade_in(2)
+    love.audio.stop()
+    new_level.music_set:play_stage(1)
+
+    new_level.exit_status = "game_success"
+    new_level.payload = nil
 
     return new_level
 
@@ -43,7 +50,7 @@ end
 
 
 function level:handle_events(key)
-    self.action_set:do_all_applicable_actions(key, self)
+    --self.action_set:do_all_applicable_actions(key, self)
     self.game:handle_events(key)
 end
 
@@ -51,11 +58,12 @@ function level:update(dt)
     self.character:update_animations()
     self.stage:update_animations()
     self.game:update(dt)
+    self.music_set:update_audio()
 
     if self.flags.is_leaving then
         self.flags.leaving_progress = self.flags.leaving_progress - dt
         if self.flags.leaving_progress <= 0 then
-            self.level_manager:load_level("texas")
+            data.game.machine:transition_state(request:new(self, self.exit_status, self.payload))
         end
     end
 end

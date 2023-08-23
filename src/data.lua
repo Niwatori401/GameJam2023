@@ -23,7 +23,7 @@ function defaults:init()
     defaults.missing_image = love.graphics.newImage("data/_meta/default.png")
     defaults.black_image = love.graphics.newImage("data/_meta/black.png")
 
-    defaults.silent = love.audio.newSource("data/_meta/silence.ogg", "static")
+    defaults.silence = love.audio.newSource("data/_meta/silence.ogg", "static")
 end
 
 local game = {}
