@@ -16,8 +16,10 @@ function game_puzzle_bobble:new(game_data)
     new_game.game_x = 610
     new_game.game_y = 15
 
+    new_game:_define_grid(game_data)
     new_game:_make_shooter_sprites(game_data)
     new_game:_make_game_bg_sprite(game_data)
+    new_game:_load_bobble_images(game_data)
     new_game:_define_level_actions()
 
     return new_game
@@ -37,6 +39,7 @@ function game_puzzle_bobble:draw(layer)
     --new_game.game_bg
     self:_draw_game_bg(layer)
     self:_draw_arrow_and_base(layer)
+    self:_draw_bobbles(layer)
 end
 
 function game_puzzle_bobble:handle_events(key)
@@ -73,6 +76,38 @@ function game_puzzle_bobble:_draw_game_bg(layer)
             s.y_scale
         )
     end
+end
+
+function game_puzzle_bobble:_draw_bobbles(layer)
+
+    local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
+
+    for i, row in ipairs(self.grid) do
+        for j, bobble_index in ipairs(row) do repeat
+            if bobble_index == 0 then
+                break
+            end
+
+            s.image = self.bobble_images[bobble_index]
+
+            if layer == s.layer then
+                love.graphics.setColor(s.color)
+                love.graphics.draw(
+                    s.image,
+                    self.game_x + (j - 1) * (self.game_width/8),
+                    self.game_y + (i - 1) * (self.game_width/8),
+                    s.rotation,
+                    (self.game_width) / (8 * s.image:getWidth()),
+                    (self.game_width) / (8 * s.image:getHeight()),
+                    s.image:getWidth() / 2,
+                    s.image:getHeight() / 2
+                )
+            end
+
+
+        until true end
+    end
+
 end
 
 
@@ -120,6 +155,10 @@ end
 
 
 --#region constructor helpers
+function game_puzzle_bobble:_set_up_game_rules()
+    self.bobbles_per_row = 8
+end
+
 
 function game_puzzle_bobble:_make_shooter_sprites(game_data)
     local arrow_image = game_data["shoot_arrow"]
@@ -148,17 +187,22 @@ function game_puzzle_bobble:_make_shooter_sprites(game_data)
 end
 
 
---- Mutates class, returns nothing
-function game_puzzle_bobble:_define_bobbles(game_data)
 
+function game_puzzle_bobble:_load_bobble_images(game_data)
+    self.bobble_images = {}
+
+    local bobble_data = game_data["bobble_info"]
+
+    for i, line in pairs(bobble_data) do
+        self.bobble_images[#self.bobble_images + 1] = game_data[line]
+    end
 end
-
 
 --- Mutates class, returns nothing
 function game_puzzle_bobble:_define_grid(game_data)
     self.grid = {}
     for i = 1, 13, 1 do
-        table.insert({0, 0, 0, 0, 0, 0, 0, 0})
+        table.insert(self.grid, {0, 0, 1, 0, 2, 0, 0, 0})
     end
 end
 
@@ -168,7 +212,7 @@ function game_puzzle_bobble:_define_level_actions()
     self.action_set = action_set:new()
 
     self.action_set:add_key_action("left", function (game)
-        self.arrow_sprite.rotation = self.arrow_sprite.rotation + 0.1
+        self.arrow_sprite.rotation = self.arrow_sprite.rotation - 0.1
 
         if self.arrow_sprite.rotation >= self.arrow_sprite.max_rotation_radians then
             self.arrow_sprite.rotation = self.arrow_sprite.max_rotation_radians
@@ -179,7 +223,7 @@ function game_puzzle_bobble:_define_level_actions()
 
 
     self.action_set:add_key_action("right", function (game)
-        self.arrow_sprite.rotation = self.arrow_sprite.rotation - 0.1
+        self.arrow_sprite.rotation = self.arrow_sprite.rotation + 0.1
 
         if self.arrow_sprite.rotation >= self.arrow_sprite.max_rotation_radians then
             self.arrow_sprite.rotation = self.arrow_sprite.max_rotation_radians
