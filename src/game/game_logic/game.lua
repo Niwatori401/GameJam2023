@@ -19,6 +19,10 @@ function game:draw()
 
 end
 
+function game:handle_input()
+
+end
+
 function game:handle_events(key)
 
 end

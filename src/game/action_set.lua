@@ -21,13 +21,13 @@ function action_set:add_key_action(key, action)
     table.insert(self.actions[key], action)
 end
 
-function action_set:do_all_applicable_actions(key, param)
+function action_set:do_all_applicable_actions(key, params)
     if self.actions[key] == nil then
         return
     end
 
     for _, action in pairs(self.actions[key]) do
-        action(param)
+        action(unpack(params))
     end
 end
 

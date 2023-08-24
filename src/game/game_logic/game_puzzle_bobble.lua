@@ -3,6 +3,7 @@ local game = require("game.game_logic.game")
 local sprite = require("graphic.sprite")
 local render_layer = require("graphic.render_layer")
 local action_set = require("game.action_set")
+local bobble = require("game.game_logic.game_puzzle_bobble.bobble")
 
 local game_puzzle_bobble = {}
 
@@ -21,6 +22,7 @@ function game_puzzle_bobble:new(game_data)
     new_game:_make_game_bg_sprite(game_data)
     new_game:_load_bobble_images(game_data)
     new_game:_define_level_actions()
+    new_game:_define_level_inputs()
 
     return new_game
 
@@ -43,7 +45,17 @@ function game_puzzle_bobble:draw(layer)
 end
 
 function game_puzzle_bobble:handle_events(key)
-    self.action_set:do_all_applicable_actions(key, self)
+    self.action_set:do_all_applicable_actions(key, {self})
+end
+
+function game_puzzle_bobble:handle_input(dt)
+
+    if love.keyboard.isDown("left") then
+        self.input_set:do_all_applicable_actions("left", {self, dt})
+    end
+    if love.keyboard.isDown("right") then
+        self.input_set:do_all_applicable_actions("right", {self, dt})
+    end
 end
 
 --#endregion
@@ -206,35 +218,40 @@ end
 function game_puzzle_bobble:_define_grid(game_data)
     self.grid = {}
     for i = 1, 7, 1 do
-        table.insert(self.grid, {1, 0, 1, 0, 2, 0, 0, 1})
+        table.insert(self.grid, {0, 0, 0, 0, 0, 0, 0, 0})
     end
 end
 
+function game_puzzle_bobble:_define_level_inputs()
+    self.input_set = action_set:new()
+
+    self.input_set:add_key_action("left", function (game, dt)
+        game.arrow_sprite.rotation = game.arrow_sprite.rotation - dt * 2
+
+        if game.arrow_sprite.rotation >= game.arrow_sprite.max_rotation_radians then
+            game.arrow_sprite.rotation = game.arrow_sprite.max_rotation_radians
+        elseif game.arrow_sprite.rotation <= game.arrow_sprite.min_rotation_radians then
+            game.arrow_sprite.rotation = game.arrow_sprite.min_rotation_radians
+        end
+    end)
+
+
+    self.input_set:add_key_action("right", function (game, dt)
+        game.arrow_sprite.rotation = game.arrow_sprite.rotation + dt * 2
+
+        if game.arrow_sprite.rotation >= game.arrow_sprite.max_rotation_radians then
+            game.arrow_sprite.rotation = game.arrow_sprite.max_rotation_radians
+        elseif game.arrow_sprite.rotation <= game.arrow_sprite.min_rotation_radians then
+            game.arrow_sprite.rotation = game.arrow_sprite.min_rotation_radians
+        end
+    end)
+
+
+end
 
 --- Mutates class, returns nothing
 function game_puzzle_bobble:_define_level_actions()
     self.action_set = action_set:new()
-
-    self.action_set:add_key_action("left", function (game)
-        self.arrow_sprite.rotation = self.arrow_sprite.rotation - 0.1
-
-        if self.arrow_sprite.rotation >= self.arrow_sprite.max_rotation_radians then
-            self.arrow_sprite.rotation = self.arrow_sprite.max_rotation_radians
-        elseif self.arrow_sprite.rotation <= self.arrow_sprite.min_rotation_radians then
-            self.arrow_sprite.rotation = self.arrow_sprite.min_rotation_radians
-        end
-    end)
-
-
-    self.action_set:add_key_action("right", function (game)
-        self.arrow_sprite.rotation = self.arrow_sprite.rotation + 0.1
-
-        if self.arrow_sprite.rotation >= self.arrow_sprite.max_rotation_radians then
-            self.arrow_sprite.rotation = self.arrow_sprite.max_rotation_radians
-        elseif self.arrow_sprite.rotation <= self.arrow_sprite.min_rotation_radians then
-            self.arrow_sprite.rotation = self.arrow_sprite.min_rotation_radians
-        end
-    end)
 
 
     self.action_set:add_key_action("escape", function (game)

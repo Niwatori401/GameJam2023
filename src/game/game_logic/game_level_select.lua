@@ -179,7 +179,7 @@ function game_level_select:draw(layer)
 end
 
 function game_level_select:handle_events(key)
-    self.action_set:do_all_applicable_actions(key, self)
+    self.action_set:do_all_applicable_actions(key, {self})
 end
 
 

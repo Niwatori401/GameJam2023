@@ -49,6 +49,13 @@ function level:new(stage, character, game_background, music_set, game_prototype,
 
 end
 
+function level:handle_input(dt)
+    -- love.keyboard.isDown()
+    self.game:handle_input(dt)
+
+end
+
+
 
 function level:handle_events(key)
     self.game:handle_events(key)

@@ -6,6 +6,7 @@ local level_manager = require("game.level.level_manager")
 local music_set = require("sound.music_set")
 local request = require("game.state.request")
 
+
 function love.load()
 
     data:init()
@@ -22,6 +23,7 @@ end
 function love.update(dt)
     data.game.game_time = data.game.game_time + dt
     level_manager.cur_level:update(dt)
+    level_manager.cur_level:handle_input(dt)
 end
 
 function love.keypressed( key )
