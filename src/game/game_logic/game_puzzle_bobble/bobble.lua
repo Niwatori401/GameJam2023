@@ -14,8 +14,8 @@ function bobble:new(bobble_type, bobble_image, pos_x, pos_y, velocity_x, velocit
 
     new_bobble.sprite = sprite:new(
         bobble_image,
-        new_bobble.pos_x,
-        new_bobble.pos_y,
+        pos_x,
+        pos_y,
         absolute_width / bobble_image:getWidth(),
         absolute_height / bobble_image:getHeight(),
         render_layer.BOBBLES,
@@ -23,8 +23,6 @@ function bobble:new(bobble_type, bobble_image, pos_x, pos_y, velocity_x, velocit
         data.color.COLOR_WHITE)
 
 
-    new_bobble.pos_x = pos_x
-    new_bobble.pos_y = pos_y
     new_bobble.velocity_x = velocity_x
     new_bobble.velocity_y = velocity_y
 

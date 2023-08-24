@@ -37,11 +37,13 @@ end
 function game_puzzle_bobble:update(dt)
 
     if self.current_bobble ~= nil then
-        self:_update_bobble_position(self.current_bobble ,dt)
+        self:_update_bobble_position(self.current_bobble, dt)
 
         if self:_bobble_should_stop(self.current_bobble) then
+
             self:_lock_bobble_into_grid(self.current_bobble)
             local popped_count = self:_pop_connected_bobbles(self.current_bobble)
+            self.current_bobble = nil
             self.level:add_points(popped_count * 10)
         end
     end
@@ -79,46 +81,47 @@ end
 
 
 
----@param i integer
----@param j integer
+---@param row integer
+---@param col integer
 ---@param bobble_color_number integer The integer value in self.grid representing the bobble type
 ---@param visited table A table of 1's and 0's representing if a tile has been visited yet.
 ---@param count table A boxed integer
-function game_puzzle_bobble:_mark_for_popping_dfs(i, j, bobble_color_number,  visited, count)
+function game_puzzle_bobble:_mark_for_popping_dfs(row, col, bobble_color_number,  visited, count)
 
-    if i < 1 or j < 1 or i > self.bobbles_per_row or j > self.bobbles_per_row or visited[i][j] == 1 then
+    if row < 1 or col < 1 or row > #self.grid or col > self.bobbles_per_row or visited[row][col] == 1 then
         return
     end
 
-    visited[i][j] = 1
-
-    if self.grid[i][j] ~= 0 and self.grid[i][j].bobble_type == bobble_color_number then
+    visited[row][col] = 1
+    --print("I,J " .. row .. ", " .. col .. ";")
+    --print(self.grid[row][col])
+    if self.grid[row][col] ~= 0 and self.grid[row][col].bobble_type == bobble_color_number then
 
         count[1] = count[1] + 1
 
-        self:_mark_for_popping_dfs(i-1, j, bobble_color_number, visited, count)
-        self:_mark_for_popping_dfs(i+1, j, bobble_color_number, visited, count)
-        self:_mark_for_popping_dfs(i, j+1, bobble_color_number, visited, count)
-        self:_mark_for_popping_dfs(i, j-1, bobble_color_number, visited, count)
+        self:_mark_for_popping_dfs(row-1, col, bobble_color_number, visited, count)
+        self:_mark_for_popping_dfs(row+1, col, bobble_color_number, visited, count)
+        self:_mark_for_popping_dfs(row, col+1, bobble_color_number, visited, count)
+        self:_mark_for_popping_dfs(row, col-1, bobble_color_number, visited, count)
 
-        if count >= 3 then
-            self.grid[i][j].should_pop = true
+        if count[1] >= 3 then
+            self.grid[row][col].should_pop = true
         end
     end
 end
 
-function game_puzzle_bobble:_mark_as_main_bobble_blob_dfs(i, j, visited)
+function game_puzzle_bobble:_mark_as_main_bobble_blob_dfs(row, col, visited)
 
-    if i < 1 or j < 1 or i > self.bobbles_per_row or j > self.bobbles_per_row or visited[i][j] == 1 or self.grid[i][j] == 0 then
+    if row < 1 or col < 1 or row > #self.grid or col > self.bobbles_per_row or visited[row][col] == 1 or self.grid[row][col] == 0 then
         return
     end
 
-    visited[i][j] = 1
+    visited[row][col] = 1
 
-    self:_mark_as_main_bobble_blob_dfs(i-1, j, visited)
-    self:_mark_as_main_bobble_blob_dfs(i+1, j, visited)
-    self:_mark_as_main_bobble_blob_dfs(i, j+1, visited)
-    self:_mark_as_main_bobble_blob_dfs(i, j-1, visited)
+    self:_mark_as_main_bobble_blob_dfs(row-1, col, visited)
+    self:_mark_as_main_bobble_blob_dfs(row+1, col, visited)
+    self:_mark_as_main_bobble_blob_dfs(row, col+1, visited)
+    self:_mark_as_main_bobble_blob_dfs(row, col-1, visited)
 
 end
 
@@ -130,22 +133,22 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
     for _ = 1, self.rows_per_game do
         table.insert(visited, {0, 0, 0, 0, 0, 0, 0, 0})
     end
-
-    local bobble_grid_x, bobble_grid_y = self:_convert_pixel_position_to_cell_index(bobble.pos_x, bobble.pos_y)
+    --print(bobble)
+    local bobble_grid_x, bobble_grid_y = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
     local dfs_count = {0}
-    self:_mark_for_popping_dfs(bobble_grid_x, bobble_grid_y, bobble.bobble_type, visited, dfs_count)
+    self:_mark_for_popping_dfs(bobble_grid_y, bobble_grid_x, bobble.bobble_type, visited, dfs_count)
 
     if dfs_count[1] < 3 then
         return 0
     end
 
     local popped_count = 0
-    for i = 1, self.rows_per_game, 1 do
-        for j = 1, self.bobbles_per_row, 1 do
-            if self.grid[i][j] ~= 0 and self.grid[i][j].should_pop then
+    for row = 1, #self.grid, 1 do
+        for col = 1, self.bobbles_per_row, 1 do
+            if self.grid[row][col] ~= 0 and self.grid[row][col].should_pop then
                 popped_count = popped_count + 1
-                self.grid[i][j]:pop()
-                self.grid[i][j] = 0
+                self.grid[row][col]:pop()
+                self.grid[row][col] = 0
             end
         end
     end
@@ -155,9 +158,9 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
         table.insert(visited, {0, 0, 0, 0, 0, 0, 0, 0})
     end
 
-    for i = 1, self.bobbles_per_row do
-        if grid[i][j] ~= 0 then
-            self:_mark_as_main_bobble_blob_dfs(i, j)
+    for col = 1, self.bobbles_per_row do
+        if self.grid[1][col] ~= 0 then
+            self:_mark_as_main_bobble_blob_dfs(1, col, visited)
         end
     end
 
@@ -175,47 +178,48 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
 end
 
 function game_puzzle_bobble:_lock_bobble_into_grid(bobble)
-    local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.pos_x, bobble.pos_y)
-    print(x_index ..  ", " .. y_index)
-    self.grid[x_index][y_index] = bobble
-    self.current_bobble = nil
+    local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
+    --print(x_index ..  ", " .. y_index)
+    self.grid[y_index][x_index] = bobble
 end
 
 
 function game_puzzle_bobble:_bobble_should_stop(bobble)
     local _, game_y = self:_get_starting_position_for_bobbles_grid()
-    print("1")
-    if bobble.pos_y <= game_y then
+
+    if bobble.sprite.y <= game_y then
         return true
     end
-    print("2")
-    local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.pos_x, bobble.pos_y)
+
+    local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
 
     if y_index > #self.grid then return false end
 
 
     local pixels_per_cell = self.game_width / self.bobbles_per_row
 
-    local remainder_x = (bobble.pos_x - self.game_x) - ((x_index - 1) * pixels_per_cell)
-    local remainder_y = (bobble.pos_y - self.game_y) - ((y_index - 1) * pixels_per_cell)
+    local remainder_x = (bobble.sprite.x - self.game_x) - ((x_index - 1) * pixels_per_cell)
+    local remainder_y = (bobble.sprite.y - self.game_y) - ((y_index - 1) * pixels_per_cell)
 
     remainder_x = remainder_x - pixels_per_cell / 2
     remainder_y = remainder_y - pixels_per_cell / 2
 
 
     if remainder_x < pixels_per_cell / 3 and x_index ~= 1 then
-        return self.grid[x_index - 1][y_index] ~= 0
+        return self.grid[y_index][x_index - 1] ~= 0
     end
-    print("3")
+
     if remainder_x > pixels_per_cell / 3 and x_index ~= self.bobbles_per_row then
-        return self.grid[x_index + 1][y_index] ~= 0
+        --print(x_index .. ", " .. y_index)
+        --print("Grid size: " .. #self.grid .. ", " .. #self.grid[1])
+        return self.grid[y_index][x_index + 1] ~= 0
     end
-    print("3.5")
+    --print("3.5")
     -- This might be buggy!
     if remainder_y > pixels_per_cell / 3 and y_index ~= 1 then
-        return self.grid[x_index][y_index - 1]
+        return self.grid[y_index - 1][x_index]
     end
-    print("4")
+    --print("4")
     return false
 end
 
@@ -225,15 +229,16 @@ function game_puzzle_bobble:_update_bobble_position(bobble, dt)
         bobble.velocity_x = -1 * bobble.velocity_x
     end
 
-    bobble.pos_x = bobble.pos_x + dt * bobble.velocity_x
-    bobble.pos_y = bobble.pos_y + dt * bobble.velocity_y
+    bobble.sprite.x = bobble.sprite.x + dt * bobble.velocity_x
+    bobble.sprite.y = bobble.sprite.y - dt * bobble.velocity_y
+    --print(bobble.sprite.y)
 end
 
 function game_puzzle_bobble:_is_bobble_touching_a_wall(bobble)
 
     local grid_x = self:_get_starting_position_for_bobbles_grid()
 
-    return bobble.pos_x - grid_x <= 0 or bobble.pos_x - grid_x >= self.game_width
+    return bobble.sprite.x - grid_x <= 0 or bobble.sprite.x - grid_x >= self.game_width
 end
 
 function game_puzzle_bobble:_convert_pixel_position_to_cell_index(pos_x, pos_y)
@@ -310,8 +315,9 @@ function game_puzzle_bobble:_get_next_bobble_row()
     local number_of_bobbles = #self.bobble_images
 
     local new_row = {}
-    for i = 1, self.bobbles_per_row, 1 do
-        table.insert(new_row, math.random(number_of_bobbles))
+    for i = 1, self.bobbles_per_row, 1 do --
+        local index = math.random(number_of_bobbles)
+        table.insert(new_row, bobble:new(index, self.bobble_images[index], 0, 0, 0, 0, 0, 0))
     end
 
     return new_row
@@ -343,15 +349,16 @@ end
 
 function game_puzzle_bobble:_draw_bobbles(layer)
 
-    local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
-
     for i, row in ipairs(self.grid) do
-        for j, bobble_index in ipairs(row) do repeat
-            if bobble_index == 0 then
+
+        for j, bobble in ipairs(row) do repeat
+            if bobble == 0 then
                 break
             end
 
-            s.image = self.bobble_images[bobble_index]
+            local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
+
+            s.image = self.bobble_images[bobble.bobble_type]
             local bobble_width = s.image:getWidth()
             local bobble_height = s.image:getHeight()
             local scale_x = (self.game_width) / (8 * bobble_width)
@@ -380,15 +387,16 @@ function game_puzzle_bobble:_draw_bobbles(layer)
 
         if layer == s.layer then
             love.graphics.setColor(s.color)
+
             love.graphics.draw(
                 s.image,
-                s.pos_x,
-                s.pos_y,
+                s.x,
+                s.y,
                 s.rotation,
                 s.scale_x,
                 s.scale_y,
-                bobble_width / 2,
-                bobble_height / 2
+                s.image:getWidth() / 2,
+                s.image:getHeight() / 2
             )
         end
     end
@@ -515,7 +523,7 @@ function game_puzzle_bobble:_define_level_actions()
     self.action_set:add_key_action("up", function (game)
         local bobble_index = math.random(#self.bobble_images)
         local velocity_x = 0
-        local velocity_y = 100
+        local velocity_y = 200
 
         game.current_bobble = bobble:new(
             bobble_index,
