@@ -89,18 +89,22 @@ function game_puzzle_bobble:_draw_bobbles(layer)
             end
 
             s.image = self.bobble_images[bobble_index]
+            local bobble_width = s.image:getWidth()
+            local bobble_height = s.image:getHeight()
+            local scale_x = (self.game_width) / (8 * bobble_width)
+            local scale_y = (self.game_width) / (8 * bobble_height)
 
             if layer == s.layer then
                 love.graphics.setColor(s.color)
                 love.graphics.draw(
                     s.image,
-                    self.game_x + (j - 1) * (self.game_width/8),
-                    self.game_y + (i - 1) * (self.game_width/8),
+                    self.game_x + (scale_x * bobble_width) / 2 + (j - 1) * (self.game_width/8),
+                    self.game_y + (3 * scale_y * bobble_height) / 2 + (i - 1) * (self.game_width/8),
                     s.rotation,
-                    (self.game_width) / (8 * s.image:getWidth()),
-                    (self.game_width) / (8 * s.image:getHeight()),
-                    s.image:getWidth() / 2,
-                    s.image:getHeight() / 2
+                    scale_x,
+                    scale_y,
+                    bobble_width / 2,
+                    bobble_height / 2
                 )
             end
 
@@ -201,8 +205,8 @@ end
 --- Mutates class, returns nothing
 function game_puzzle_bobble:_define_grid(game_data)
     self.grid = {}
-    for i = 1, 13, 1 do
-        table.insert(self.grid, {0, 0, 1, 0, 2, 0, 0, 0})
+    for i = 1, 7, 1 do
+        table.insert(self.grid, {1, 0, 1, 0, 2, 0, 0, 1})
     end
 end
 
