@@ -19,6 +19,8 @@ function game_puzzle_bobble:new(game_data)
     new_game.grid = {}
     new_game.current_bobble = nil
     new_game:_load_bobble_images(game_data)
+
+    new_game.next_bobble_index = math.random(#new_game.bobble_images)
     new_game:_set_up_game_rules()
     new_game:_set_initial_bobble_rows()
     new_game:_make_shooter_sprites(game_data)
@@ -44,6 +46,7 @@ function game_puzzle_bobble:update(dt)
             self:_lock_bobble_into_grid(self.current_bobble)
             local popped_count = self:_pop_connected_bobbles(self.current_bobble)
             self.current_bobble = nil
+            self.next_bobble_index = math.random(#self.bobble_images)
             self.level:add_points(popped_count * 10)
         end
     end
@@ -59,6 +62,7 @@ function game_puzzle_bobble:draw(layer)
     self:_draw_game_bg(layer)
     self:_draw_arrow_and_base(layer)
     self:_draw_bobbles(layer)
+    self:_draw_next_bobble(layer)
 end
 
 function game_puzzle_bobble:handle_events(key)
@@ -210,16 +214,14 @@ function game_puzzle_bobble:_bobble_should_stop(bobble)
     end
 
     if remainder_x > pixels_per_cell / 3 and x_index ~= self.bobbles_per_row then
-        --print(x_index .. ", " .. y_index)
-        --print("Grid size: " .. #self.grid .. ", " .. #self.grid[1])
         return self.grid[y_index][x_index + 1] ~= 0
     end
-    --print("3.5")
+
     -- This might be buggy!
     if remainder_y > pixels_per_cell / 3 and y_index ~= 1 then
         return self.grid[y_index - 1][x_index]
     end
-    --print("4")
+
     return false
 end
 
@@ -347,6 +349,31 @@ function game_puzzle_bobble:_get_starting_position_for_bobbles_grid()
     return self.game_x + self.game_width / (2 * self.bobbles_per_row), self.game_y + (2 * self.game_height) / (2 * self.bobbles_per_row)
 end
 
+function game_puzzle_bobble:_draw_next_bobble(layer)
+    if self.next_bobble_index == nil then return end
+
+    local s = sprite:new(self.bobble_images[self.next_bobble_index], 0, 0, 1, 1, render_layer.BOBBLES, 0, data.color.COLOR_WHITE)
+    local bobble_width = s.image:getWidth()
+    local bobble_height = s.image:getHeight()
+    local scale_x = (self.game_width) / (8 * bobble_width)
+    local scale_y = (self.game_width) / (8 * bobble_height)
+    local x_start, y_start = self:_get_starting_position_for_bobbles_grid()
+
+    if layer == s.layer then
+        love.graphics.setColor(s.color)
+        love.graphics.draw(
+            s.image,
+            x_start + self.game_width / 2,
+            y_start + self.game_height - (self.game_width/8),
+            s.rotation,
+            scale_x,
+            scale_y,
+            bobble_width,
+            bobble_height * 1.5
+        )
+    end
+end
+
 function game_puzzle_bobble:_draw_bobbles(layer)
 
     for i, row in ipairs(self.grid) do
@@ -455,7 +482,7 @@ function game_puzzle_bobble:_set_up_game_rules()
     self.bobbles_per_row = 8
     self.rows_per_game = 7
     self.time_since_last_row = 0
-    self.time_to_next_row = 3
+    self.time_to_next_row = 10
 end
 
 function game_puzzle_bobble:_make_shooter_sprites(game_data)
@@ -526,8 +553,13 @@ function game_puzzle_bobble:_define_level_actions()
     self.action_set = action_set:new()
 
     self.action_set:add_key_action("up", function (game)
-        local bobble_index = math.random(#self.bobble_images)
-        local total_velocity = 250
+        if game.next_bobble_index == nil then
+            return
+        end
+
+        local bobble_index = game.next_bobble_index
+        game.next_bobble_index = nil
+        local total_velocity = 750
 
         local velocity_x = total_velocity * math.sin(game.arrow_sprite.rotation)
         local velocity_y = total_velocity * math.cos(game.arrow_sprite.rotation)
@@ -540,6 +572,8 @@ function game_puzzle_bobble:_define_level_actions()
             velocity_x,
             velocity_y
         )
+
+        game.current_bobble.is_flying = true
     end)
 
     self.action_set:add_key_action("escape", function (game)
