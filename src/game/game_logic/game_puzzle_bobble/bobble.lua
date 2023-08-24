@@ -6,7 +6,7 @@ local bobble = {}
 
 
 
-function bobble:new(bobble_type, bobble_image, pos_x, pos_y, velocity_x, velocity_y, absolute_width, absolute_height)
+function bobble:new(bobble_type, bobble_image, pos_x, pos_y, velocity_x, velocity_y)
     local new_bobble = setmetatable({}, {__index = bobble})
 
     new_bobble.bobble_type = bobble_type
@@ -16,8 +16,8 @@ function bobble:new(bobble_type, bobble_image, pos_x, pos_y, velocity_x, velocit
         bobble_image,
         pos_x,
         pos_y,
-        absolute_width / bobble_image:getWidth(),
-        absolute_height / bobble_image:getHeight(),
+        1,
+        1,
         render_layer.BOBBLES,
         0,
         data.color.COLOR_WHITE)

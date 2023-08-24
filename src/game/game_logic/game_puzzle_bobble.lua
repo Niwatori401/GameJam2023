@@ -317,7 +317,7 @@ function game_puzzle_bobble:_get_next_bobble_row()
     local new_row = {}
     for i = 1, self.bobbles_per_row, 1 do --
         local index = math.random(number_of_bobbles)
-        table.insert(new_row, bobble:new(index, self.bobble_images[index], 0, 0, 0, 0, 0, 0))
+        table.insert(new_row, bobble:new(index, self.bobble_images[index], 0, 0, 0, 0))
     end
 
     return new_row
@@ -385,6 +385,11 @@ function game_puzzle_bobble:_draw_bobbles(layer)
     if self.current_bobble ~= nil then
         s = self.current_bobble.sprite
 
+        local bobble_width = s.image:getWidth()
+        local bobble_height = s.image:getHeight()
+        local scale_x = (self.game_width) / (8 * bobble_width)
+        local scale_y = (self.game_width) / (8 * bobble_height)
+
         if layer == s.layer then
             love.graphics.setColor(s.color)
 
@@ -393,10 +398,10 @@ function game_puzzle_bobble:_draw_bobbles(layer)
                 s.x,
                 s.y,
                 s.rotation,
-                s.scale_x,
-                s.scale_y,
-                s.image:getWidth() / 2,
-                s.image:getHeight() / 2
+                scale_x,
+                scale_y,
+                bobble_width / 2,
+                bobble_height / 2
             )
         end
     end
@@ -522,8 +527,10 @@ function game_puzzle_bobble:_define_level_actions()
 
     self.action_set:add_key_action("up", function (game)
         local bobble_index = math.random(#self.bobble_images)
-        local velocity_x = 0
-        local velocity_y = 200
+        local total_velocity = 250
+
+        local velocity_x = total_velocity * math.sin(game.arrow_sprite.rotation)
+        local velocity_y = total_velocity * math.cos(game.arrow_sprite.rotation)
 
         game.current_bobble = bobble:new(
             bobble_index,
@@ -531,9 +538,7 @@ function game_puzzle_bobble:_define_level_actions()
             self.game_x + self.game_width / 2,
             self.game_y + self.game_height,
             velocity_x,
-            velocity_y,
-            self.game_width / 8,
-            self.game_width / 8
+            velocity_y
         )
     end)
 
