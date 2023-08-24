@@ -76,6 +76,7 @@ function level:update(dt)
 end
 
 function level:add_points(pts)
+    if pts == 0 then return end
 
     self.character:add_points(pts)
     local index = self.character:get_cur_image_stage_index()

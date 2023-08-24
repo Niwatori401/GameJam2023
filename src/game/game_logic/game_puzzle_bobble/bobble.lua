@@ -9,8 +9,8 @@ local bobble = {}
 function bobble:new(bobble_type, bobble_image, pos_x, pos_y, velocity_x, velocity_y, absolute_width, absolute_height)
     local new_bobble = setmetatable({}, {__index = bobble})
 
-    new_bobble.should_pop = false
     new_bobble.bobble_type = bobble_type
+    new_bobble.should_pop = false
 
     new_bobble.sprite = sprite:new(
         bobble_image,
