@@ -39,7 +39,6 @@ end
 function game_puzzle_bobble:update(dt)
 
     if self.current_bobble ~= nil then
-        self:_update_bobble_position(self.current_bobble, dt)
 
         if self:_bobble_should_stop(self.current_bobble) then
 
@@ -49,6 +48,10 @@ function game_puzzle_bobble:update(dt)
             self.next_bobble_index = math.random(#self.bobble_images)
             --self.level:add_points(popped_count * 10)
         end
+        if self.current_bobble ~= nil then
+            self:_update_bobble_position(self.current_bobble, dt)
+        end
+
     end
 
     self:_add_rows_periodically(dt)
@@ -189,39 +192,33 @@ end
 
 
 function game_puzzle_bobble:_bobble_should_stop(bobble)
-    local _, game_y = self:_get_starting_position_for_bobbles_grid()
 
-    if bobble.sprite.y <= game_y then
-        return true
-    end
-
-    local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
-
-    if y_index > #self.grid then
-        --print "bailed out"
-        return false
-    end
-
+    local cell_x_index, cell_y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
 
     local pixels_per_cell = self.game_width / self.bobbles_per_row
 
-    local remainder_x = (bobble.sprite.x - self.game_x) - ((x_index - 1) * pixels_per_cell)
-    local remainder_y = (bobble.sprite.y - self.game_y) - ((y_index - 1) * pixels_per_cell)
+    local local_x_coord = bobble.sprite.x - self.game_x
+    local local_y_coord = bobble.sprite.y - self.game_y
 
-    print("Pixels per cell: " .. pixels_per_cell .. " and Remainder x: " .. remainder_x .. " and remainder_y: " .. remainder_y)
+    -- cell local pixel position. Ranges from [0, pixels_per_cell)
+    local remainder_x = local_x_coord - ((cell_x_index - 1) * pixels_per_cell)
+    local remainder_y = local_y_coord - ((cell_y_index) * pixels_per_cell)
 
-    if remainder_x < pixels_per_cell / 2 and x_index ~= 1 and self.grid[y_index][x_index - 1] ~= 0 then
-        print("LOOKING LEFT")
-        return true
-    elseif remainder_x > pixels_per_cell / 2 and x_index ~= self.bobbles_per_row and self.grid[y_index][x_index + 1] ~= 0 then
-        print("LOOKING RIGHT")
-        return true
+
+    if remainder_y < pixels_per_cell / 2 then
+        if cell_y_index ~= 1 and self.grid[cell_y_index - 1][cell_x_index] ~= 0 then
+            return true
+        end
     end
 
-    -- This might be buggy!
-    if remainder_y < pixels_per_cell and y_index ~= 1 and self.grid[y_index - 1][x_index] ~= 0 then
-        print("LOOKING UP")
-        return true
+    if remainder_x - pixels_per_cell / 2 < 0 then
+        if cell_x_index ~= 1 and self.grid[cell_y_index][cell_x_index - 1] ~= 0 then
+            return true
+        end
+    else
+        if cell_x_index ~= self.bobbles_per_row and self.grid[cell_y_index][cell_x_index + 1] ~= 0 then
+            return true
+        end
     end
 
     return false
@@ -260,6 +257,8 @@ function game_puzzle_bobble:_convert_pixel_position_to_cell_index(pos_x, pos_y)
         x_index = self.bobbles_per_row
     end
 
+    y_index = y_index - 1
+
     if y_index < 1 then
         y_index = 1
     end
@@ -274,6 +273,12 @@ function game_puzzle_bobble:_set_initial_bobble_rows()
         table.insert(self.grid, self:_get_next_bobble_row())
     end
 
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
     table.insert(self.grid, {0,0,0,0,0,0,0,0})
     table.insert(self.grid, {0,0,0,0,0,0,0,0})
 end
@@ -580,7 +585,7 @@ function game_puzzle_bobble:_define_level_actions()
 
         local bobble_index = game.next_bobble_index
         game.next_bobble_index = nil
-        local total_velocity = 200 --750
+        local total_velocity = 750
 
         local velocity_x = total_velocity * math.sin(game.arrow_sprite.rotation)
         local velocity_y = total_velocity * math.cos(game.arrow_sprite.rotation)
