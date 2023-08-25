@@ -19,6 +19,10 @@ function game:draw()
 
 end
 
+function game:handle_release_events()
+
+end
+
 function game:handle_input()
 
 end

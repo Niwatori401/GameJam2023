@@ -55,7 +55,9 @@ function level:handle_input(dt)
 
 end
 
-
+function level:handle_release_events(key)
+    self.game:handle_release_events(key)
+end
 
 function level:handle_events(key)
     self.game:handle_events(key)

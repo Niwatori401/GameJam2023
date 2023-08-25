@@ -26,18 +26,20 @@ function love.update(dt)
     level_manager.cur_level:handle_input(dt)
 end
 
-function love.keypressed( key )
+function love.keyreleased(key)
+    level_manager.cur_level:handle_release_events(key)
+end
+
+function love.keypressed(key)
 
 
     level_manager.cur_level:handle_events(key)
 
-
-
-    if key == "g" then
-        level_manager.cur_level:add_points(50)
-    elseif key == "l" then
-        level_manager.cur_level:add_points(-50)
-    end
+    -- if key == "g" then
+    --     level_manager.cur_level:add_points(50)
+    -- elseif key == "l" then
+    --     level_manager.cur_level:add_points(-50)
+    -- end
 
 end
 

@@ -31,6 +31,7 @@ function game_puzzle_bobble:new(game_data)
 
     new_game:_define_level_actions()
     new_game:_define_level_inputs()
+    new_game:_define_level_release_actions()
 
     return new_game
 
@@ -75,6 +76,10 @@ end
 
 function game_puzzle_bobble:handle_events(key)
     self.action_set:do_all_applicable_actions(key, {self})
+end
+
+function game_puzzle_bobble:handle_release_events(key)
+    self.action_release_set:do_all_applicable_actions(key, {self})
 end
 
 function game_puzzle_bobble:handle_input(dt)
@@ -412,7 +417,7 @@ function game_puzzle_bobble:_draw_bobbles(layer)
                 break
             end
 
-            local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_GRAY_TRANSPARENT)
+            local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
 
             s.image = self.bobble_images[bobble.bobble_type]
             local bobble_width = s.image:getWidth()
@@ -511,6 +516,7 @@ function game_puzzle_bobble:_set_up_game_rules()
     self.rows_per_game = 15
     self.time_since_last_row = 0
     self.time_to_next_row = 100
+    self.rotation_speed_multiplier = 1
 end
 
 function game_puzzle_bobble:_make_shooter_sprites(game_data)
@@ -524,8 +530,8 @@ function game_puzzle_bobble:_make_shooter_sprites(game_data)
         render_layer.GAME_BG,
         0,
         data.color.COLOR_WHITE)
-    self.arrow_sprite.max_rotation_radians = math.pi / 4
-    self.arrow_sprite.min_rotation_radians = -math.pi / 4
+    self.arrow_sprite.max_rotation_radians = 3 * math.pi / 8
+    self.arrow_sprite.min_rotation_radians = -3 * math.pi / 8
 
     local arrow_base_image = game_data["shoot_base"]
     self.arrow_base_sprite = sprite:new(
@@ -549,12 +555,25 @@ function game_puzzle_bobble:_load_bobble_images(game_data)
     end
 end
 
+function game_puzzle_bobble:_define_level_release_actions()
+    self.action_release_set = action_set:new()
+
+    self.action_release_set:add_key_action("lshift", function (game)
+
+        game.rotation_speed_multiplier = 1
+
+    end)
+
+
+
+end
+
 
 function game_puzzle_bobble:_define_level_inputs()
     self.input_set = action_set:new()
 
     self.input_set:add_key_action("left", function (game, dt)
-        game.arrow_sprite.rotation = game.arrow_sprite.rotation - dt * 2
+        game.arrow_sprite.rotation = game.arrow_sprite.rotation - dt * 2 * game.rotation_speed_multiplier
 
         if game.arrow_sprite.rotation >= game.arrow_sprite.max_rotation_radians then
             game.arrow_sprite.rotation = game.arrow_sprite.max_rotation_radians
@@ -565,7 +584,7 @@ function game_puzzle_bobble:_define_level_inputs()
 
 
     self.input_set:add_key_action("right", function (game, dt)
-        game.arrow_sprite.rotation = game.arrow_sprite.rotation + dt * 2
+        game.arrow_sprite.rotation = game.arrow_sprite.rotation + dt * 2 * game.rotation_speed_multiplier
 
         if game.arrow_sprite.rotation >= game.arrow_sprite.max_rotation_radians then
             game.arrow_sprite.rotation = game.arrow_sprite.max_rotation_radians
@@ -579,6 +598,12 @@ end
 
 function game_puzzle_bobble:_define_level_actions()
     self.action_set = action_set:new()
+
+    self.action_set:add_key_action("lshift", function (game)
+
+        game.rotation_speed_multiplier = 0.3
+
+    end)
 
     self.action_set:add_key_action("up", function (game)
         if game.next_bobble_index == nil then
