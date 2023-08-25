@@ -43,10 +43,10 @@ function game_puzzle_bobble:update(dt)
         if self:_bobble_should_stop(self.current_bobble) then
 
             self:_lock_bobble_into_grid(self.current_bobble)
-            --local popped_count = self:_pop_connected_bobbles(self.current_bobble)
+            local popped_count = self:_pop_connected_bobbles(self.current_bobble)
             self.current_bobble = nil
             self.next_bobble_index = math.random(#self.bobble_images)
-            --self.level:add_points(popped_count * 10)
+            self.level:add_points(popped_count * 10)
         end
         if self.current_bobble ~= nil then
             self:_update_bobble_position(self.current_bobble, dt)
@@ -170,10 +170,14 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
         end
     end
 
+    print("w")
     for i, row in ipairs(self.grid) do
+        print(row)
         for j, entry in ipairs(row) do
             if visited[i][j] ~= 1 and self.grid[i][j] ~= 0 then
+                print("e")
                 entry:pop()
+                print("o")
                 self.grid[i][j] = 0
                 popped_count = popped_count + 1
             end
@@ -185,8 +189,6 @@ end
 
 function game_puzzle_bobble:_lock_bobble_into_grid(bobble)
     local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
-    --print(x_index ..  ", " .. y_index)
-    print("Locking bobble into cell " .. x_index .. ", " .. y_index)
     self.grid[y_index][x_index] = bobble
 end
 
@@ -226,7 +228,10 @@ end
 
 
 function game_puzzle_bobble:_update_bobble_position(bobble, dt)
-    if self:_is_bobble_touching_a_wall(bobble) then
+    -- Small number to check that it doesnt get "stuck" in a wall when it hits it
+    if self:_is_bobble_touching_a_wall(bobble) and
+        (bobble.time_of_last_reflection == nil or  data.game.game_time - bobble.time_of_last_reflection > 0.3) then
+        bobble.time_of_last_reflection  = data.game.game_time
         bobble.velocity_x = -1 * bobble.velocity_x
     end
 
@@ -506,7 +511,7 @@ end
 
 function game_puzzle_bobble:_set_up_game_rules()
     self.bobbles_per_row = 8
-    self.rows_per_game = 7
+    self.rows_per_game = 15
     self.time_since_last_row = 0
     self.time_to_next_row = 100
 end
