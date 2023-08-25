@@ -44,16 +44,15 @@ function game_puzzle_bobble:update(dt)
         if self:_bobble_should_stop(self.current_bobble) then
 
             self:_lock_bobble_into_grid(self.current_bobble)
-            local popped_count = self:_pop_connected_bobbles(self.current_bobble)
+            --local popped_count = self:_pop_connected_bobbles(self.current_bobble)
             self.current_bobble = nil
             self.next_bobble_index = math.random(#self.bobble_images)
-            self.level:add_points(popped_count * 10)
+            --self.level:add_points(popped_count * 10)
         end
     end
 
     self:_add_rows_periodically(dt)
 end
-
 
 
 function game_puzzle_bobble:draw(layer)
@@ -184,6 +183,7 @@ end
 function game_puzzle_bobble:_lock_bobble_into_grid(bobble)
     local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
     --print(x_index ..  ", " .. y_index)
+    print("Locking bobble into cell " .. x_index .. ", " .. y_index)
     self.grid[y_index][x_index] = bobble
 end
 
@@ -197,7 +197,10 @@ function game_puzzle_bobble:_bobble_should_stop(bobble)
 
     local x_index, y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
 
-    if y_index > #self.grid then return false end
+    if y_index > #self.grid then
+        --print "bailed out"
+        return false
+    end
 
 
     local pixels_per_cell = self.game_width / self.bobbles_per_row
@@ -205,21 +208,20 @@ function game_puzzle_bobble:_bobble_should_stop(bobble)
     local remainder_x = (bobble.sprite.x - self.game_x) - ((x_index - 1) * pixels_per_cell)
     local remainder_y = (bobble.sprite.y - self.game_y) - ((y_index - 1) * pixels_per_cell)
 
-    remainder_x = remainder_x - pixels_per_cell / 2
-    remainder_y = remainder_y - pixels_per_cell / 2
+    print("Pixels per cell: " .. pixels_per_cell .. " and Remainder x: " .. remainder_x .. " and remainder_y: " .. remainder_y)
 
-
-    if remainder_x < pixels_per_cell / 3 and x_index ~= 1 then
-        return self.grid[y_index][x_index - 1] ~= 0
-    end
-
-    if remainder_x > pixels_per_cell / 3 and x_index ~= self.bobbles_per_row then
-        return self.grid[y_index][x_index + 1] ~= 0
+    if remainder_x < pixels_per_cell / 2 and x_index ~= 1 and self.grid[y_index][x_index - 1] ~= 0 then
+        print("LOOKING LEFT")
+        return true
+    elseif remainder_x > pixels_per_cell / 2 and x_index ~= self.bobbles_per_row and self.grid[y_index][x_index + 1] ~= 0 then
+        print("LOOKING RIGHT")
+        return true
     end
 
     -- This might be buggy!
-    if remainder_y > pixels_per_cell / 3 and y_index ~= 1 then
-        return self.grid[y_index - 1][x_index]
+    if remainder_y < pixels_per_cell and y_index ~= 1 and self.grid[y_index - 1][x_index] ~= 0 then
+        print("LOOKING UP")
+        return true
     end
 
     return false
@@ -233,22 +235,34 @@ function game_puzzle_bobble:_update_bobble_position(bobble, dt)
 
     bobble.sprite.x = bobble.sprite.x + dt * bobble.velocity_x
     bobble.sprite.y = bobble.sprite.y - dt * bobble.velocity_y
-    --print(bobble.sprite.y)
+
 end
 
 function game_puzzle_bobble:_is_bobble_touching_a_wall(bobble)
 
     local grid_x = self:_get_starting_position_for_bobbles_grid()
 
-    return bobble.sprite.x - grid_x <= 0 or bobble.sprite.x - grid_x >= self.game_width
+    return bobble.sprite.x - grid_x <= 0 or (bobble.sprite.x - grid_x + self.game_width / self.bobbles_per_row) >= self.game_width
 end
 
 function game_puzzle_bobble:_convert_pixel_position_to_cell_index(pos_x, pos_y)
 
-    local x_start, y_start = self:_get_starting_position_for_bobbles_grid()
+    local x_start = self.game_x
+    local y_start = self.game_y
+
 
     local x_index = math.ceil((pos_x - x_start) / (self.game_width / self.bobbles_per_row))
     local y_index = math.ceil((pos_y - y_start) / (self.game_width / self.bobbles_per_row))
+
+    if x_index < 1 then
+        x_index = 1
+    elseif x_index > self.bobbles_per_row then
+        x_index = self.bobbles_per_row
+    end
+
+    if y_index < 1 then
+        y_index = 1
+    end
 
     return x_index, y_index
 end
@@ -259,6 +273,9 @@ function game_puzzle_bobble:_set_initial_bobble_rows()
     for _ = 1, rows_to_start_with, 1 do
         table.insert(self.grid, self:_get_next_bobble_row())
     end
+
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    table.insert(self.grid, {0,0,0,0,0,0,0,0})
 end
 
 function game_puzzle_bobble:_add_rows_periodically(dt)
@@ -280,7 +297,7 @@ function game_puzzle_bobble:_add_rows_periodically(dt)
 end
 
 function game_puzzle_bobble:_trim_and_insert_bobble_row(new_row)
-    self:_trim_zeroed_rows(self.grid)
+    --self:_trim_zeroed_rows(self.grid)
 
     for i = #self.grid, 1, -1 do
         self.grid[i + 1] = self.grid[i]
@@ -346,7 +363,7 @@ function game_puzzle_bobble:_draw_game_bg(layer)
 end
 
 function game_puzzle_bobble:_get_starting_position_for_bobbles_grid()
-    return self.game_x + self.game_width / (2 * self.bobbles_per_row), self.game_y + (2 * self.game_height) / (2 * self.bobbles_per_row)
+    return self.game_x + self.game_width / (2 * self.bobbles_per_row), self.game_y + (3 * self.game_width) / (2 * self.bobbles_per_row)
 end
 
 function game_puzzle_bobble:_draw_next_bobble(layer)
@@ -357,7 +374,8 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
     local bobble_height = s.image:getHeight()
     local scale_x = (self.game_width) / (8 * bobble_width)
     local scale_y = (self.game_width) / (8 * bobble_height)
-    local x_start, y_start = self:_get_starting_position_for_bobbles_grid()
+    local x_start = self.game_x
+    local y_start = self.game_y
 
     if layer == s.layer then
         love.graphics.setColor(s.color)
@@ -368,10 +386,14 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
             s.rotation,
             scale_x,
             scale_y,
-            bobble_width,
-            bobble_height * 1.5
+            bobble_width / 2, --bobble_width,
+            bobble_height / 2 --bobble_height * 1.5
         )
     end
+
+    love.graphics.setColor(data.color.COLOR_PINK)
+    love.graphics.circle("fill", x_start + self.game_width / 2, y_start + self.game_height - (self.game_width/8), 3)
+
 end
 
 function game_puzzle_bobble:_draw_bobbles(layer)
@@ -383,7 +405,7 @@ function game_puzzle_bobble:_draw_bobbles(layer)
                 break
             end
 
-            local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
+            local s = sprite:new(nil, 0, 0, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_GRAY_TRANSPARENT)
 
             s.image = self.bobble_images[bobble.bobble_type]
             local bobble_width = s.image:getWidth()
@@ -475,14 +497,13 @@ end
 --#endregion
 
 
-
 --#region constructor helpers
 
 function game_puzzle_bobble:_set_up_game_rules()
     self.bobbles_per_row = 8
     self.rows_per_game = 7
     self.time_since_last_row = 0
-    self.time_to_next_row = 10
+    self.time_to_next_row = 100
 end
 
 function game_puzzle_bobble:_make_shooter_sprites(game_data)
@@ -559,7 +580,7 @@ function game_puzzle_bobble:_define_level_actions()
 
         local bobble_index = game.next_bobble_index
         game.next_bobble_index = nil
-        local total_velocity = 750
+        local total_velocity = 200 --750
 
         local velocity_x = total_velocity * math.sin(game.arrow_sprite.rotation)
         local velocity_y = total_velocity * math.cos(game.arrow_sprite.rotation)
