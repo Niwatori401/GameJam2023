@@ -4,6 +4,7 @@ local sprite = require("graphic.sprite")
 local render_layer = require("graphic.render_layer")
 local action_set = require("game.action_set")
 local bobble = require("game.game_logic.game_puzzle_bobble.bobble")
+local thermometer = require("game.game_logic.game_puzzle_bobble.thermometer")
 
 local game_puzzle_bobble = {}
 
@@ -19,6 +20,8 @@ function game_puzzle_bobble:new(game_data)
     new_game.grid = {}
     new_game.current_bobble = nil
     new_game:_load_bobble_images(game_data)
+
+    new_game.thermometer = thermometer:new(sprite:new(game_data["thermometer_base"], 450, 0, data.window.SCREEN_Y / game_data["thermometer_base"]:getHeight(), data.window.SCREEN_Y / game_data["thermometer_base"]:getHeight(), render_layer.GAME_BG, 0, data.color.COLOR_WHITE), 120, 300, 120, data.color.BERY_NICE_PINK, 120)
 
     new_game.next_bobble_index = math.random(#new_game.bobble_images)
     new_game:_set_up_game_rules()
@@ -38,6 +41,8 @@ end
 
 function game_puzzle_bobble:update(dt)
 
+    self.thermometer:update(dt)
+
     if self.current_bobble ~= nil then
 
         if self:_bobble_should_stop(self.current_bobble) then
@@ -47,6 +52,7 @@ function game_puzzle_bobble:update(dt)
             self.current_bobble = nil
             self.next_bobble_index = math.random(#self.bobble_images)
             self.level:add_points(popped_count * 10)
+            self.thermometer:add_amount_to_current(popped_count * 10)
         end
         if self.current_bobble ~= nil then
             self:_update_bobble_position(self.current_bobble, dt)
@@ -60,11 +66,11 @@ end
 
 function game_puzzle_bobble:draw(layer)
 
-    --new_game.game_bg
     self:_draw_game_bg(layer)
     self:_draw_arrow_and_base(layer)
     self:_draw_bobbles(layer)
     self:_draw_next_bobble(layer)
+    self.thermometer:draw()
 end
 
 function game_puzzle_bobble:handle_events(key)
@@ -99,8 +105,7 @@ function game_puzzle_bobble:_mark_for_popping_dfs(row, col, bobble_color_number,
     end
 
     visited[row][col] = 1
-    --print("I,J " .. row .. ", " .. col .. ";")
-    --print(self.grid[row][col])
+
     if self.grid[row][col] ~= 0 and self.grid[row][col].bobble_type == bobble_color_number then
 
         count[1] = count[1] + 1
@@ -139,7 +144,7 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
     for _ = 1, self.rows_per_game do
         table.insert(visited, {0, 0, 0, 0, 0, 0, 0, 0})
     end
-    --print(bobble)
+
     local bobble_grid_x, bobble_grid_y = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
     local dfs_count = {0}
     self:_mark_for_popping_dfs(bobble_grid_y, bobble_grid_x, bobble.bobble_type, visited, dfs_count)
@@ -170,14 +175,10 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
         end
     end
 
-    print("w")
     for i, row in ipairs(self.grid) do
-        print(row)
         for j, entry in ipairs(row) do
             if visited[i][j] ~= 1 and self.grid[i][j] ~= 0 then
-                print("e")
                 entry:pop()
-                print("o")
                 self.grid[i][j] = 0
                 popped_count = popped_count + 1
             end
@@ -400,10 +401,6 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
             bobble_height / 2 --bobble_height * 1.5
         )
     end
-
-    love.graphics.setColor(data.color.COLOR_PINK)
-    love.graphics.circle("fill", x_start + self.game_width / 2, y_start + self.game_height - (self.game_width/8), 3)
-
 end
 
 function game_puzzle_bobble:_draw_bobbles(layer)
