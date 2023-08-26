@@ -8,7 +8,8 @@ local request = require("game.state.request")
 
 
 function love.load()
-
+    love.math.setRandomSeed(2, 200)
+    math.randomseed(os.time())
     data:init()
     data.game.machine = machine
     machine:init("base")
