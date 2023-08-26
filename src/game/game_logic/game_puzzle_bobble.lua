@@ -69,6 +69,10 @@ function game_puzzle_bobble:update(dt)
 
     self.thermometer:update(dt)
 
+    for _, a in pairs(self.text_box.animations) do
+        self.text_box[a.property_to_animate] = a:increment_animation()
+    end
+
     if self.current_bobble ~= nil then
 
         if self:_bobble_should_stop(self.current_bobble) then
@@ -476,7 +480,6 @@ function game_puzzle_bobble:_should_show_text_box()
 
     if self.started_playing_time == nil then return end
 
-
     local cur_time_elapsed = data.game.game_time - self.started_playing_time
 
     local modulo_cycle = 3
@@ -496,11 +499,26 @@ end
 
 function game_puzzle_bobble:_draw_dialogue(layer)
 
-    if layer ~= render_layer.GAME_BG then return end
+    if layer ~= render_layer.GAME_BG or self.started_playing_time == nil then return end
 
-    if not self:_should_show_text_box() then
-        return
+    local target_x = 20
+    local should_show_textbox = self:_should_show_text_box()
+    if self.did_entry and not should_show_textbox then
+
+        self.did_entry = false
+
+        self.text_box:add_animation(animation:new(20, -1 * self.text_box.image:getWidth(), data.game.game_time, 0.5, animation.scheme_linear_interpolate, "x"))
+        self.text_box.x = target_x
+
+    elseif should_show_textbox and not self.did_entry then
+
+        self.did_entry = true
+
+        self.text_box:add_animation(animation:new(-1 * self.text_box.image:getWidth(), target_x, data.game.game_time, 0.5, animation.scheme_linear_interpolate, "x"))
+        self.text_box.x = -1 * self.text_box.image:getWidth()
     end
+
+
 
     love.graphics.setColor(self.text_box.color)
     love.graphics.draw(
