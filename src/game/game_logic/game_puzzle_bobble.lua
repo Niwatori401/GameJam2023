@@ -278,11 +278,11 @@ function game_puzzle_bobble:_bobble_should_stop(bobble)
         end
     end
 
-    if remainder_x - pixels_per_cell / 2 < 0 then
+    if remainder_x - pixels_per_cell / 3 < 0 then
         if cell_x_index ~= 1 and self.grid[cell_y_index][cell_x_index - 1] ~= 0 then
             return true
         end
-    else
+    elseif remainder_x - 2 * pixels_per_cell / 3 > 0 then
         if cell_x_index ~= self.bobbles_per_row and self.grid[cell_y_index][cell_x_index + 1] ~= 0 then
             return true
         end
