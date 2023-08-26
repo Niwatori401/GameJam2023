@@ -40,7 +40,11 @@ function game_puzzle_bobble:new(game_data, level)
         game_data["thermometer_back"],
         new_game.level.character.points,
         data.color.BERY_NICE_PINK,
-        new_game.level.character.stages)
+        new_game.level.character.stages,
+        game_data["thud"],
+        game_data["break"],
+        game_data["thermometer_base_broken"],
+        game_data["thermometer_back_broken"])
 
     new_game.next_bobble_index = math.random(#new_game.bobble_images)
     new_game:_make_textbox_sprite(game_data)

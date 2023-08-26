@@ -3,11 +3,16 @@ local animation = require("graphic.animation")
 
 local thermometer = {}
 
-function thermometer:new(sprite, background_image, current_amount, color, stages)
+function thermometer:new(sprite, background_image, current_amount, color, stages, thud_sound, crash_sound, broken_container_image, broken_background_image)
 
     local new_therm = setmetatable({}, {__index = thermometer})
 
+    self.thud_sound = thud_sound
+    self.crash_sound = crash_sound
     self.background_image = background_image
+    self.background_image_broken = broken_background_image
+    self.foreground_image_broken = broken_container_image
+
     self.lowest_point_amount = stages[1] - 10
     self.sprite = sprite
     self.fluid_color = color
@@ -19,10 +24,16 @@ function thermometer:new(sprite, background_image, current_amount, color, stages
 end
 
 function thermometer:draw(layer)
+
+    if self.broken then
+
+    end
+
+
     -- Thermometer background
     love.graphics.setColor(self.sprite.color)
     love.graphics.draw(
-        self.background_image,
+        self.broken == nil and self.background_image or self.background_image_broken,
         self.sprite.x,
         self.sprite.y,
         0,
@@ -80,7 +91,7 @@ function thermometer:draw(layer)
 
     love.graphics.setColor(self.sprite.color)
     love.graphics.draw(
-        self.sprite.image,
+        self.broken == nil and self.sprite.image or self.foreground_image_broken,
         self.sprite.x,
         self.sprite.y,
         0,
@@ -93,16 +104,27 @@ function thermometer:get_max_amount()
 end
 
 function thermometer:update(dt)
-    for _, a in pairs(self.sprite.animations) do
+    for _, a in pairs(self.sprite.animations) do repeat
 
         if a.property_to_animate == "current_amount" then
+            if self.broken then
+                break -- continue
+            end
+
             self[a.property_to_animate] = a:increment_animation(data.game.game_time)
+
+            if self.current_amount > tonumber(self.stages[#self.stages]) then
+                self.broken = true
+                love.audio.play(self.crash_sound)
+                self.sprite:add_animation(animation:new(self.sprite.x, self.sprite.x + 5, data.game.game_time, 0.08, animation.scheme_cycle_5, "x"))
+            end
 
             if self.current_amount >= self:get_max_amount() then
                 for index, value in ipairs(self.stages) do
                     if self.current_amount < tonumber(value) + 10 then
                         self.max_amount_index = index
-                        -- play sound
+
+                        love.audio.play(self.thud_sound)
                         self.sprite:add_animation(animation:new(self.sprite.x, self.sprite.x + 5, data.game.game_time, 0.08, animation.scheme_cycle_5, "x"))
                         break
                     end
@@ -111,7 +133,7 @@ function thermometer:update(dt)
         else
             self.sprite[a.property_to_animate] = a:increment_animation(data.game.game_time)
         end
-    end
+    until true end
 end
 
 -- function thermometer:set_max_amount(amt)
