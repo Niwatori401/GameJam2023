@@ -153,7 +153,6 @@ end
 --#region game logic functions
 
 
-
 ---@param row integer
 ---@param col integer
 ---@param bobble_color_number integer The integer value in self.grid representing the bobble type
@@ -923,7 +922,7 @@ function game_puzzle_bobble:_define_level_actions()
             bobble_index,
             self.bobble_images[bobble_index],
             self.game_x + self.game_width / 2,
-            self.game_y + self.game_height,
+            self.game_y + self.game_height - (self.game_width/self.bobbles_per_row),
             velocity_x,
             velocity_y
         )
