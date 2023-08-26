@@ -45,6 +45,7 @@ function font:init()
     self.fonts = {}
     self.fonts["Crosterian"] = love.graphics.newFont("data/_meta/_fonts/Crosterian.ttf")
     self.fonts["ArchitectsDaughter"] = love.graphics.newFont("data/_meta/_fonts/ArchitectsDaughter.ttf")
+    self.fonts["ArchitectsDaughter18"] = love.graphics.newFont("data/_meta/_fonts/ArchitectsDaughter.ttf", 18)
     self.fonts["Graziano"] = love.graphics.newFont("data/_meta/_fonts/Graziano.ttf")
     self.fonts["Nicolas_Frespech"] = love.graphics.newFont("data/_meta/_fonts/Nicolas_Frespech.ttf")
 end

@@ -1,3 +1,4 @@
+local animation = require("graphic.animation")
 local data = require("data")
 local game = require("game.game_logic.game")
 local sprite = require("graphic.sprite")
@@ -20,6 +21,11 @@ function game_puzzle_bobble:new(game_data, level)
     new_game.level = level
     new_game.grid = {}
     new_game.current_bobble = nil
+
+    new_game.time_since_last_dialogue_update = 0
+    new_game.time_between_dialogue_updates =6
+    new_game.cached_dialogue = nil
+
     new_game:_load_bobble_images(game_data)
 
     new_game.thermometer = thermometer:new(
@@ -37,6 +43,7 @@ function game_puzzle_bobble:new(game_data, level)
         new_game.level.character.stages)
 
     new_game.next_bobble_index = math.random(#new_game.bobble_images)
+    new_game:_make_textbox_sprite(game_data)
     new_game:_set_up_game_rules(game_data)
     new_game:_set_initial_bobble_rows()
     new_game:_make_audio_fx(game_data)
@@ -94,6 +101,8 @@ function game_puzzle_bobble:update(dt)
 
     end
 
+    self.time_since_last_dialogue_update = self.time_since_last_dialogue_update + dt
+
     self:_add_rows_periodically(dt)
 end
 
@@ -106,6 +115,7 @@ function game_puzzle_bobble:draw(layer)
     self:_draw_arrow_and_base(layer)
     self:_draw_bobbles(layer)
     self:_draw_next_bobble(layer)
+    self:_draw_dialogue(layer)
     --self:_draw_upper_bar(layer)
 
     self.thermometer:draw()
@@ -442,9 +452,83 @@ function game_puzzle_bobble:_get_next_bobble_row()
     return new_row
 end
 
+function game_puzzle_bobble:_get_current_line_of_dialogue()
+
+    if self.cached_dialogue == nil or self.time_since_last_dialogue_update >= self.time_between_dialogue_updates then
+
+        self.cached_dialogue = self.level.character:get_next_dialogue_line()
+
+        -- self.text_box:add_animation(animation:new(-1 * self.text_box:getWidth(), 20, data.game.game_time, 0.5, animation.scheme_linear_interpolate, "x"))
+
+        self.time_since_last_dialogue_update = 0
+    end
+
+    return self.cached_dialogue
+end
+
 --#endregion
 
+function game_puzzle_bobble:_should_show_text_box()
+
+    if self.started_playing_time == nil then return end
+
+
+    local cur_time_elapsed = data.game.game_time - self.started_playing_time
+
+    local modulo_cycle = 3
+    local cycle_length = self.time_between_dialogue_updates / (modulo_cycle - 1)
+
+    local cycles = math.floor(cur_time_elapsed / cycle_length)
+
+    if cycles % modulo_cycle == 0 then
+        return true
+    end
+
+    return false
+end
+
+
 --#region drawing helper fucntion
+
+function game_puzzle_bobble:_draw_dialogue(layer)
+
+    if layer ~= render_layer.GAME_BG then return end
+
+    if not self:_should_show_text_box() then
+        return
+    end
+
+    love.graphics.setColor(self.text_box.color)
+    love.graphics.draw(
+        self.text_box.image,
+        self.text_box.x,
+        self.text_box.y,
+        0,
+        1,
+        1)
+
+
+    local offset_x = 0
+    local offset_y = 30
+    local max_width =  0.8 * self.text_box.image:getWidth()
+    local font_scale = 1
+    local line_of_dialogue = self:_get_current_line_of_dialogue()
+
+    love.graphics.setColor(data.color.COLOR_BLACK)
+    love.graphics.printf(
+        line_of_dialogue,
+        data.font.fonts["ArchitectsDaughter18"],
+        self.text_box.x + self.text_box.image:getWidth() / 2 + offset_x,
+        self.text_box.y + offset_y,
+        max_width,
+        "center",
+        0,
+        font_scale,
+        font_scale,
+        max_width / 2,
+        0)
+
+end
 
 function game_puzzle_bobble:_draw_box_under_shooter(layer)
     if layer == render_layer.GAME_BG then
@@ -639,8 +723,12 @@ end
 
 --#endregion
 
-
 --#region constructor helpers
+
+function game_puzzle_bobble:_make_textbox_sprite(game_data)
+
+    self.text_box = sprite:new(game_data["text_box"], 20, data.window.SCREEN_Y * 0.6, 1, 1, render_layer.GAME_BG, 0, data.color.COLOR_WHITE)
+end
 
 function game_puzzle_bobble:_set_up_game_rules(game_data)
 
@@ -742,6 +830,10 @@ function game_puzzle_bobble:_define_level_actions()
     self.action_set:add_key_action("up", function (game)
         if game.next_bobble_index == nil then
             return
+        end
+
+        if game.started_playing_time == nil then
+            self.started_playing_time = data.game.game_time
         end
 
         local bobble_index = game.next_bobble_index

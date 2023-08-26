@@ -15,9 +15,17 @@ character.__index = character
 ---@param stages table array of stage numbers from lowest to highest, indexed by normal indices
 ---@param points number | nil
 ---@return character
-function character:new(name, sprite, images, stages, points)
+function character:new(name, sprite, images, stages, points, dialogue)
     local new_character = {}
     setmetatable(new_character, self)
+
+    new_character.dialogue = dialogue
+    new_character.dialogue_index = {}
+
+    for stage, _ in ipairs(new_character.dialogue) do
+        new_character.dialogue_index[stage] = 1
+    end
+
 
     new_character.name = name or "Pea Tear Griffin"
     new_character.images = images or data.defaults.missing_image
@@ -48,6 +56,22 @@ function character:draw(layer)
         )
     end
 end
+
+function character:get_next_dialogue_line()
+
+    local stage_index = self:get_cur_image_stage_index()
+
+
+    local line_number = self.dialogue_index[stage_index]
+    local line_text = self.dialogue[stage_index][line_number]
+
+    if #self.dialogue[stage_index] ~= line_number then
+        self.dialogue_index[stage_index] = self.dialogue_index[stage_index] + 1
+    end
+
+    return line_text
+end
+
 
 function character:add_points(amount)
 
