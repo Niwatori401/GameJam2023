@@ -14,8 +14,8 @@ function love.load()
     data.game.machine = machine
     machine:init("base")
 
-    machine:transition_state(request:new(nil, "unconditional_load", {level_to_load = "texas"}))
-    --machine:transition_state(request:new(nil, "unconditional_load", {level_to_load = "_splash_screen"}))
+    --machine:transition_state(request:new(nil, "unconditional_load", {level_to_load = "texas"}))
+    machine:transition_state(request:new(nil, "unconditional_load", {level_to_load = "_splash_screen"}))
 
     sprite_renderer:init()
 

@@ -120,6 +120,7 @@ function game_puzzle_bobble:draw(layer)
     self:_draw_game_background(layer)
     self:_draw_game_bg(layer)
     self:_draw_box_under_shooter(layer)
+    self:_draw_time_to_next_row_indicator(layer)
     self:_draw_fail_line(layer)
     self:_draw_arrow_and_base(layer)
     self:_draw_bobbles(layer)
@@ -476,6 +477,8 @@ end
 
 --#endregion
 
+--#region drawing helper fucntion
+
 function game_puzzle_bobble:_should_show_text_box()
 
     if self.started_playing_time == nil then return end
@@ -494,8 +497,31 @@ function game_puzzle_bobble:_should_show_text_box()
     return false
 end
 
+function game_puzzle_bobble:_draw_time_to_next_row_indicator(layer)
 
---#region drawing helper fucntion
+    if layer ~= render_layer.GAME_BG then
+        return
+    end
+
+
+    local circle_radius = 40
+    local pos_x = self.game_x + self.game_width - circle_radius - 5
+    local pos_y = self.game_y + self.game_height - circle_radius - 5
+
+    love.graphics.setColor(data.color.COLOR_WHITE)
+    love.graphics.circle("fill", pos_x, pos_y, circle_radius)
+    love.graphics.setColor(data.color.DARK_PINK)
+    love.graphics.arc(
+        "fill",
+        "closed",
+        pos_x,
+        pos_y,
+        circle_radius,
+        0,
+        2 * math.pi * (self.time_since_last_row / self.time_to_next_row))
+
+end
+
 
 function game_puzzle_bobble:_draw_dialogue(layer)
 
