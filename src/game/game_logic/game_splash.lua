@@ -20,7 +20,7 @@ function game_splash:new(game_data, lvl)
     local game_info = utility.parse_info(game_data["splash_data"])
 
 
-    -- new_game.background = game_data["splash"]
+    new_game.next_level = game_info.next_level
     new_game.duration = tonumber(game_info.duration)
 
     new_game.elapsed_time = 0
@@ -28,7 +28,7 @@ function game_splash:new(game_data, lvl)
 
     new_game.action_set:add_key_action("return", function (game)
         game.level.exit_status = "unconditional_load"
-        game.level.payload = {level_to_load = "_level_select"}
+        game.level.payload = {level_to_load = new_game.next_level}
         game.level:transition_out()
     end)
 
@@ -42,7 +42,7 @@ function game_splash:update(dt)
 
     if self.elapsed_time >= self.duration then
         self.level.exit_status = "unconditional_load"
-        self.level.payload = {level_to_load = "_level_select"}
+        self.level.payload = {level_to_load = self.next_level}
         self.level:transition_out()
     end
 end
