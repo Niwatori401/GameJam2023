@@ -27,6 +27,7 @@ function game_puzzle_bobble:new(game_data, level)
     new_game.cached_dialogue = nil
 
     new_game:_load_bobble_images(game_data)
+    new_game:_load_food_images(game_data)
 
     new_game.thermometer = thermometer:new(
         sprite:new(game_data["thermometer_base"],
@@ -612,6 +613,19 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
 
     if layer == s.layer then
         love.graphics.setColor(s.color)
+        s.image = self.food_images[self.next_bobble_index]
+        love.graphics.setColor(s.color)
+        love.graphics.draw(
+            s.image,
+            x_start + self.game_width / 2,
+            y_start + self.game_height - (self.game_width/self.bobbles_per_row),
+            s.rotation,
+            0.8 * scale_x * (bobble_width / s.image:getWidth()),
+            0.8 * scale_y * (bobble_height / s.image:getHeight()),
+            s.image:getWidth() / 2,
+            s.image:getHeight() / 2
+        )
+        s.image = self.bobble_images[self.next_bobble_index]
         love.graphics.draw(
             s.image,
             x_start + self.game_width / 2,
@@ -663,8 +677,21 @@ function game_puzzle_bobble:_draw_bobbles(layer)
             local scale_x = (self.game_width) / (self.bobbles_per_row * bobble_width)
             local scale_y = (self.game_width) / (self.bobbles_per_row * bobble_height)
             local x_start, y_start = self:_get_starting_position_for_bobbles_grid()
+
             if layer == s.layer then
+                s.image = self.food_images[bobble.bobble_type]
                 love.graphics.setColor(s.color)
+                love.graphics.draw(
+                    s.image,
+                    x_start + (j - 1) * (self.game_width/self.bobbles_per_row),
+                    y_start + (i - 1) * (self.game_width/self.bobbles_per_row),
+                    s.rotation,
+                    0.8 * scale_x * (bobble_width / s.image:getWidth()),
+                    0.8 * scale_y * (bobble_height / s.image:getHeight()),
+                    s.image:getWidth() / 2,
+                    s.image:getHeight() / 2
+                )
+                s.image = self.bobble_images[bobble.bobble_type]
                 love.graphics.draw(
                     s.image,
                     x_start + (j - 1) * (self.game_width/self.bobbles_per_row),
@@ -691,7 +718,19 @@ function game_puzzle_bobble:_draw_bobbles(layer)
 
         if layer == s.layer then
             love.graphics.setColor(s.color)
-
+            s.image = self.food_images[self.current_bobble.bobble_type]
+            love.graphics.setColor(s.color)
+            love.graphics.draw(
+                s.image,
+                s.x,
+                s.y,
+                s.rotation,
+                0.8 * scale_x * (bobble_width / s.image:getWidth()),
+                0.8 * scale_y * (bobble_height / s.image:getHeight()),
+                s.image:getWidth() / 2,
+                s.image:getHeight() / 2
+            )
+            s.image = self.bobble_images[self.current_bobble.bobble_type]
             love.graphics.draw(
                 s.image,
                 s.x,
@@ -806,6 +845,18 @@ function game_puzzle_bobble:_load_bobble_images(game_data)
         self.bobble_images[#self.bobble_images + 1] = game_data[line]
     end
 end
+
+function game_puzzle_bobble:_load_food_images(game_data)
+
+    self.food_images = {}
+
+    local food_data = game_data["food_info"]
+
+    for i, line in pairs(food_data) do
+        self.food_images[#self.food_images + 1] = game_data[line]
+    end
+end
+
 
 function game_puzzle_bobble:_define_level_release_actions()
     self.action_release_set = action_set:new()
