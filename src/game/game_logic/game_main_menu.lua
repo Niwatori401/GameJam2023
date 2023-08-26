@@ -16,7 +16,7 @@ function game_main_menu:new(game_data, lvl)
 
     new_game.level = lvl
     new_game.action_set = action_set:new()
-
+    new_game.font_size_factor = 1
     local game_info = utility.parse_info(game_data["game_info"])
 
 
@@ -36,13 +36,14 @@ end
 
 
 function game_main_menu:update(dt)
-
+    self.elapsed_time = (self.elapsed_time + dt) % (2 * math.pi)
+    self.font_size_factor = math.sin(self.elapsed_time)
 end
 
 function game_main_menu:draw(layer)
 
     if layer == render_layer.EFFECTS then
-        local font_scale = 1.3
+        local font_scale = 1.3 + 0.2 * self.font_size_factor
         local drop_shadow_offset = 1
         local max_width = 400
         local x_pos = data.window.SCREEN_X / 2
@@ -51,7 +52,7 @@ function game_main_menu:draw(layer)
         love.graphics.setColor(data.color.COLOR_WHITE)
         love.graphics.printf(
             "Press ENTER to play!",
-            data.font.fonts["ArchitectsDaughter"],
+            data.font.fonts["ArchitectsDaughter18"],
             x_pos + drop_shadow_offset,
             y_pos + drop_shadow_offset,
             max_width,
@@ -66,7 +67,7 @@ function game_main_menu:draw(layer)
         love.graphics.setColor(data.color.COLOR_BLACK)
         love.graphics.printf(
             "Press ENTER to play!",
-            data.font.fonts["ArchitectsDaughter"],
+            data.font.fonts["ArchitectsDaughter18"],
             x_pos,
             y_pos,
             max_width,
