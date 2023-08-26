@@ -23,7 +23,7 @@ function game_puzzle_bobble:new(game_data, level)
     new_game.current_bobble = nil
 
     new_game.time_since_last_dialogue_update = 0
-    new_game.time_between_dialogue_updates =6
+    new_game.time_between_dialogue_updates = 5
     new_game.cached_dialogue = nil
 
     new_game:_load_bobble_images(game_data)
@@ -633,8 +633,8 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
             s.rotation,
             scale_x,
             scale_y,
-            bobble_width / 2, --bobble_width,
-            bobble_height / 2 --bobble_height * 1.5
+            bobble_width / 2,
+            bobble_height / 2
         )
     end
 end
