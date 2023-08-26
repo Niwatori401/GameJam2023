@@ -555,7 +555,7 @@ end
 
 function game_puzzle_bobble:_draw_box_under_shooter(layer)
     if layer == render_layer.GAME_BG then
-        love.graphics.setColor(data.color.COLOR_DARK_GRAY)
+        love.graphics.setColor(data.color.BERY_NICE_PINK)
         local y_coord = self.game_y + (self.rows_per_game) * (self.game_width / self.bobbles_per_row)
         love.graphics.rectangle(
             "fill",
@@ -712,7 +712,7 @@ function game_puzzle_bobble:_draw_arrow_and_base(layer)
     local target_width_percentage = 0.5
     local target_height_percentage = 0.3
 
-    local s = self.arrow_sprite
+    local s = self.arrow_base_sprite
     if layer == s.layer then
         love.graphics.setColor(s.color)
         love.graphics.draw(
@@ -727,18 +727,20 @@ function game_puzzle_bobble:_draw_arrow_and_base(layer)
         )
     end
 
-    s = self.arrow_base_sprite
+    target_width_percentage = 0.5
+    target_height_percentage = 0.3
+    s = self.arrow_sprite
     if layer == s.layer then
         love.graphics.setColor(s.color)
         love.graphics.draw(
             s.image,
             s.x,
-            s.y,
+            s.y - 60,
             s.rotation,
             target_width_percentage / s.image:getWidth() * self.game_width,
             target_height_percentage / s.image:getHeight() * self.game_height,
             s.image:getWidth() / 2,
-            s.image:getHeight()
+            s.image:getHeight() / 2
         )
     end
 
