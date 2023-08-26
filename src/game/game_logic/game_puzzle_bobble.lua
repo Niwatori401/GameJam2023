@@ -442,8 +442,8 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
     local s = sprite:new(self.bobble_images[self.next_bobble_index], 0, 0, 1, 1, render_layer.BOBBLES, 0, data.color.COLOR_WHITE)
     local bobble_width = s.image:getWidth()
     local bobble_height = s.image:getHeight()
-    local scale_x = (self.game_width) / (8 * bobble_width)
-    local scale_y = (self.game_width) / (8 * bobble_height)
+    local scale_x = (self.game_width) / (self.bobbles_per_row * bobble_width)
+    local scale_y = (self.game_width) / (self.bobbles_per_row * bobble_height)
     local x_start = self.game_x
     local y_start = self.game_y
 
@@ -452,7 +452,7 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
         love.graphics.draw(
             s.image,
             x_start + self.game_width / 2,
-            y_start + self.game_height - (self.game_width/8),
+            y_start + self.game_height - (self.game_width/self.bobbles_per_row),
             s.rotation,
             scale_x,
             scale_y,
@@ -476,15 +476,15 @@ function game_puzzle_bobble:_draw_bobbles(layer)
             s.image = self.bobble_images[bobble.bobble_type]
             local bobble_width = s.image:getWidth()
             local bobble_height = s.image:getHeight()
-            local scale_x = (self.game_width) / (8 * bobble_width)
-            local scale_y = (self.game_width) / (8 * bobble_height)
+            local scale_x = (self.game_width) / (self.bobbles_per_row * bobble_width)
+            local scale_y = (self.game_width) / (self.bobbles_per_row * bobble_height)
             local x_start, y_start = self:_get_starting_position_for_bobbles_grid()
             if layer == s.layer then
                 love.graphics.setColor(s.color)
                 love.graphics.draw(
                     s.image,
-                    x_start + (j - 1) * (self.game_width/8),
-                    y_start + (i - 1) * (self.game_width/8),
+                    x_start + (j - 1) * (self.game_width/self.bobbles_per_row),
+                    y_start + (i - 1) * (self.game_width/self.bobbles_per_row),
                     s.rotation,
                     scale_x,
                     scale_y,
@@ -502,8 +502,8 @@ function game_puzzle_bobble:_draw_bobbles(layer)
 
         local bobble_width = s.image:getWidth()
         local bobble_height = s.image:getHeight()
-        local scale_x = (self.game_width) / (8 * bobble_width)
-        local scale_y = (self.game_width) / (8 * bobble_height)
+        local scale_x = (self.game_width) / (self.bobbles_per_row * bobble_width)
+        local scale_y = (self.game_width) / (self.bobbles_per_row * bobble_height)
 
         if layer == s.layer then
             love.graphics.setColor(s.color)

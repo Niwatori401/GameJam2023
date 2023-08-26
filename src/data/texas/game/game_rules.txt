@@ -1,7 +1,7 @@
 time_to_first_row=5
 min_time_per_row=2
 decrease_in_time_per_row=0.1
-bobbles_per_row=8
-rows_to_lose=9
+bobbles_per_row=12
+rows_to_lose=13
 points_per_bobble=1
-initial_rows=3
+initial_rows=2
