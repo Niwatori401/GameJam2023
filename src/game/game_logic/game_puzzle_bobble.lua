@@ -222,10 +222,14 @@ end
 
 
 function game_puzzle_bobble:_bobble_should_stop(bobble)
+    local pixels_per_cell = self.game_width / self.bobbles_per_row
+    if bobble.sprite.y + pixels_per_cell /2  < self.game_y then
+        return true
+    end
 
     local cell_x_index, cell_y_index = self:_convert_pixel_position_to_cell_index(bobble.sprite.x, bobble.sprite.y)
 
-    local pixels_per_cell = self.game_width / self.bobbles_per_row
+
 
     local local_x_coord = bobble.sprite.x - self.game_x
     local local_y_coord = bobble.sprite.y - self.game_y
@@ -290,7 +294,7 @@ function game_puzzle_bobble:_convert_pixel_position_to_cell_index(pos_x, pos_y)
         x_index = self.bobbles_per_row
     end
 
-    y_index = y_index - 1
+    --y_index = y_index - 1
 
     if y_index < 1 then
         y_index = 1
@@ -408,7 +412,7 @@ function game_puzzle_bobble:_get_last_nonzero_row_index()
 end
 
 function game_puzzle_bobble:_is_game_failure()
-    return self:_get_last_nonzero_row_index() >= self.rows_per_game
+    return self:_get_last_nonzero_row_index() > self.rows_per_game
 end
 
 function game_puzzle_bobble:_get_next_bobble_row()
@@ -470,7 +474,7 @@ function game_puzzle_bobble:_draw_game_bg(layer)
 end
 
 function game_puzzle_bobble:_get_starting_position_for_bobbles_grid()
-    return self.game_x + self.game_width / (2 * self.bobbles_per_row), self.game_y + (3 * self.game_width) / (2 * self.bobbles_per_row)
+    return self.game_x + self.game_width / (2 * self.bobbles_per_row), self.game_y + (1 * self.game_width) / (2 * self.bobbles_per_row)
 end
 
 function game_puzzle_bobble:_draw_next_bobble(layer)
