@@ -1,0 +1,6 @@
+bobble_1=food_1
+bobble_2=food_2
+bobble_3=food_3
+bobble_4=food_4
+bobble_5=food_5
+bobble_6=food_6

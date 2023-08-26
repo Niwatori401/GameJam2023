@@ -39,6 +39,7 @@ function game_puzzle_bobble:new(game_data, level)
     new_game.next_bobble_index = math.random(#new_game.bobble_images)
     new_game:_set_up_game_rules(game_data)
     new_game:_set_initial_bobble_rows()
+    new_game:_make_audio_fx(game_data)
     new_game:_make_shooter_sprites(game_data)
     new_game:_make_game_bg_sprite(game_data)
 
@@ -63,6 +64,20 @@ function game_puzzle_bobble:update(dt)
 
             self:_lock_bobble_into_grid(self.current_bobble)
             local popped_count = self:_pop_connected_bobbles(self.current_bobble)
+
+            if popped_count >= 5 then
+                love.audio.play(self.audio.pop_5)
+            elseif popped_count == 4 then
+                love.audio.play(self.audio.pop_4)
+            elseif popped_count == 3 then
+                love.audio.play(self.audio.pop_3)
+            elseif popped_count == 2 then
+                love.audio.play(self.audio.pop_2)
+            elseif popped_count == 1 then
+                love.audio.play(self.audio.pop_1)
+            end
+
+
             self.current_bobble = nil
             self.next_bobble_index = math.random(#self.bobble_images)
             self.level:add_points(popped_count * self.points_per_bobble)
@@ -745,6 +760,8 @@ function game_puzzle_bobble:_define_level_actions()
             velocity_y
         )
 
+        love.audio.play(self.audio.shoot)
+
         game.current_bobble.is_flying = true
     end)
 
@@ -766,6 +783,20 @@ function game_puzzle_bobble:_make_game_bg_sprite(game_data)
         render_layer.GAME_BG,
         0,
         data.color.COLOR_WHITE)
+end
+
+function game_puzzle_bobble:_make_audio_fx(game_data)
+
+    self.audio = {}
+    self.audio.pop_1 = game_data["pop_1"]
+    self.audio.pop_2 = game_data["pop_2"]
+    self.audio.pop_3 = game_data["pop_3"]
+    self.audio.pop_4 = game_data["pop_4"]
+    self.audio.pop_5 = game_data["pop_5"]
+
+    self.audio.shoot = game_data["shoot"]
+    self.audio.lose = game_data["lose"]
+
 end
 
 --#endregion
