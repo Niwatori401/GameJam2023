@@ -64,8 +64,13 @@ function game_puzzle_bobble:update(dt)
             local popped_count = self:_pop_connected_bobbles(self.current_bobble)
             self.current_bobble = nil
             self.next_bobble_index = math.random(#self.bobble_images)
-            self.level:add_points(popped_count * 10)
-            self.thermometer:add_amount_to_current(popped_count * 10)
+            self.level:add_points(popped_count * self.points_per_bobble)
+            self.thermometer:add_amount_to_current(popped_count * self.points_per_bobble)
+
+            if self:_is_game_failure() then
+                self.level.exit_status = "game_failure"
+                self.level:transition_out()
+            end
         end
         if self.current_bobble ~= nil then
             self:_update_bobble_position(self.current_bobble, dt)
@@ -313,14 +318,10 @@ function game_puzzle_bobble:_set_initial_bobble_rows()
         table.insert(blank_rows, 0)
     end
 
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
-    table.insert(self.grid, table_shallow_copy(blank_rows))
+    for _ = 1, self.rows_per_game * 1.5, 1 do
+        table.insert(self.grid, table_shallow_copy(blank_rows))
+    end
+
 end
 
 function game_puzzle_bobble:_add_rows_periodically(dt)
@@ -575,6 +576,7 @@ function game_puzzle_bobble:_set_up_game_rules(game_data)
     self.decrease_per_row = tonumber(game_rules.decrease_in_time_per_row)
     self.min_time_per_row = tonumber(game_rules.min_time_per_row)
     self.rows_to_start_with = tonumber(game_rules.initial_rows)
+    self.points_per_bobble = tonumber(game_rules.points_per_bobble)
     self.rotation_speed_multiplier = 1
 end
 
