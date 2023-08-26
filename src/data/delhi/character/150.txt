@@ -1,9 +1,7 @@
-[1] <BELLY_SLOSH.OGG> Oh!
-[2] Well, this should be interesting...
-[3] You think you can keep up?
-[2] Stage 2 specific lines
--It's delicious!
--That one could use more spices, perhaps.
--Pick up the pace a little, hm?
--<LIGHT_BURP1.OGG> Ah...
--You simply must continue!
+Well, this should be interesting...
+You think you can keep up?
+It's delicious!
+That one could use more spices, perhaps.
+Pick up the pace a little, hm?
+*soft burp* - Ah...
+You simply must continue!
