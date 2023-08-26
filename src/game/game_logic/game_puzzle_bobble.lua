@@ -820,8 +820,8 @@ function game_puzzle_bobble:_make_shooter_sprites(game_data)
         render_layer.GAME_BG,
         0,
         data.color.COLOR_WHITE)
-    self.arrow_sprite.max_rotation_radians = 3 * math.pi / 8
-    self.arrow_sprite.min_rotation_radians = -3 * math.pi / 8
+    self.arrow_sprite.max_rotation_radians = 7 * math.pi / 16
+    self.arrow_sprite.min_rotation_radians = -7 * math.pi / 16
 
     local arrow_base_image = game_data["shoot_base"]
     self.arrow_base_sprite = sprite:new(
