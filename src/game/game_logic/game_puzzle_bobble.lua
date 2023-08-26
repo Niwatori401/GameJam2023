@@ -88,6 +88,7 @@ function game_puzzle_bobble:draw(layer)
     self:_draw_arrow_and_base(layer)
     self:_draw_bobbles(layer)
     self:_draw_next_bobble(layer)
+    self:_draw_upper_bar(layer)
     self.thermometer:draw()
 end
 
@@ -459,6 +460,13 @@ function game_puzzle_bobble:_draw_next_bobble(layer)
             bobble_width / 2, --bobble_width,
             bobble_height / 2 --bobble_height * 1.5
         )
+    end
+end
+
+function game_puzzle_bobble:_draw_upper_bar(layer)
+    if layer == render_layer.GAME_BG then
+        love.graphics.setColor(data.color.COLOR_GRAY)
+        love.graphics.rectangle("fill", self.game_x, self.game_y, self.game_width, self.game_width / self.bobbles_per_row)
     end
 end
 
