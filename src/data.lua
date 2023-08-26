@@ -49,6 +49,8 @@ function font:init()
     self.fonts["ArchitectsDaughter18"] = love.graphics.newFont("data/_meta/_fonts/ArchitectsDaughter.ttf", 18)
     self.fonts["Graziano"] = love.graphics.newFont("data/_meta/_fonts/Graziano.ttf")
     self.fonts["Nicolas_Frespech"] = love.graphics.newFont("data/_meta/_fonts/Nicolas_Frespech.ttf")
+    self.fonts["PublicPixel"] = love.graphics.newFont("data/_meta/_fonts/PublicPixel.ttf")
+
 end
 
 

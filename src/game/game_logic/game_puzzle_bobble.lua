@@ -120,6 +120,7 @@ function game_puzzle_bobble:draw(layer)
     self:_draw_game_background(layer)
     self:_draw_game_bg(layer)
     self:_draw_box_under_shooter(layer)
+    self:_draw_score_and_box(layer)
     self:_draw_time_to_next_row_indicator(layer)
     self:_draw_fail_line(layer)
     self:_draw_arrow_and_base(layer)
@@ -481,6 +482,37 @@ end
 --#endregion
 
 --#region drawing helper fucntion
+
+function game_puzzle_bobble:_draw_score_and_box(layer)
+    if layer ~= render_layer.GAME_BG then
+        return
+    end
+
+    local x_offset = 20
+    local y_offset = 60
+    local width = 70
+    local height = 30
+    love.graphics.setColor(data.color.COLOR_GRAY)
+    love.graphics.rectangle("fill", self.game_x + x_offset, self.game_y + self.game_height - y_offset, width, height)
+
+    local font_scale = 1
+
+
+    -- Drop shadow
+    love.graphics.setColor(data.color.COLOR_DARK_RED)
+    love.graphics.printf(
+        self.level.character.points,
+        data.font.fonts["PublicPixel"],
+        self.game_x + x_offset + width / 2,
+        self.game_y + self.game_height - y_offset + 10,
+        width,
+        "center",
+        0,
+        font_scale,
+        font_scale,
+        width / 2,
+        0)
+end
 
 function game_puzzle_bobble:_should_show_text_box()
 
