@@ -11,10 +11,11 @@ local game_level_select = {}
 setmetatable(game_level_select, {__index = game})
 
 
-function game_level_select:new(game_data)
+function game_level_select:new(game_data, lvl)
     local new_game = setmetatable({}, {__index = game_level_select})
 
 
+    new_game.level = lvl
 
     local map_info = utility.parse_info(game_data["map_info"])
     local level_info = utility.parse_info(game_data["level_info"])

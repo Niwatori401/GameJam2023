@@ -35,11 +35,13 @@ function love.keypressed(key)
 
     level_manager.cur_level:handle_events(key)
 
-    -- if key == "g" then
-    --     level_manager.cur_level:add_points(50)
-    -- elseif key == "l" then
-    --     level_manager.cur_level:add_points(-50)
-    -- end
+    if key == "g" then
+        level_manager.cur_level:add_points(10)
+        level_manager.cur_level.game.thermometer:add_amount_to_current(10)
+    elseif key == "l" then
+        level_manager.cur_level:add_points(-5)
+        level_manager.cur_level.game.thermometer:add_amount_to_current(-5)
+    end
 
 end
 

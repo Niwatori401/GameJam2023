@@ -6,6 +6,7 @@ color.COLOR_BLACK = {0 / 255, 0 / 255, 0 / 255}
 color.COLOR_GRAY = {230 / 255, 230 / 255, 230 / 255}
 color.COLOR_GRAY_TRANSPARENT = {230 / 255, 230 / 255, 230 / 255, 0.4}
 color.BERY_NICE_PINK = {255 / 255, 198 / 255, 243 / 255}
+color.COLOR_DARK_RED = {255/ 255, 0, 42 /255}
 color.COLOR_CLEAR = {0,0,0,0}
 color.COLOR_WHITE = {1,1,1,1}
 

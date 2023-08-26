@@ -32,8 +32,7 @@ function level:new(stage, character, game_background, music_set, game_prototype,
     new_level.flags = {}
     new_level.flags.is_leaving = false
 
-    new_level.game = games[game_prototype]:new(game_data)
-    new_level.game.level = new_level
+    new_level.game = games[game_prototype]:new(game_data, new_level)
 
     new_level.stage:animation_fade_in(0.5)
     new_level.character:animation_enter_screen()

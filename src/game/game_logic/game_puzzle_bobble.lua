@@ -10,18 +10,30 @@ local game_puzzle_bobble = {}
 
 setmetatable(game_puzzle_bobble, {__index = game})
 
-function game_puzzle_bobble:new(game_data)
+function game_puzzle_bobble:new(game_data, level)
     local new_game = setmetatable({}, {__index = game_puzzle_bobble})
 
     new_game.game_width = 380
     new_game.game_height = 540
     new_game.game_x = 610
     new_game.game_y = 15
+    new_game.level = level
     new_game.grid = {}
     new_game.current_bobble = nil
     new_game:_load_bobble_images(game_data)
 
-    new_game.thermometer = thermometer:new(sprite:new(game_data["thermometer_base"], 450, 0, data.window.SCREEN_Y / game_data["thermometer_base"]:getHeight(), data.window.SCREEN_Y / game_data["thermometer_base"]:getHeight(), render_layer.GAME_BG, 0, data.color.COLOR_WHITE), 120, 300, 120, data.color.BERY_NICE_PINK, 120)
+    new_game.thermometer = thermometer:new(
+        sprite:new(game_data["thermometer_base"],
+        450,
+        0,
+        data.window.SCREEN_Y / game_data["thermometer_base"]:getHeight(),
+        data.window.SCREEN_Y / game_data["thermometer_base"]:getHeight(),
+        render_layer.GAME_BG,
+        0,
+        data.color.COLOR_WHITE),
+        new_game.level.character.points,
+        data.color.BERY_NICE_PINK,
+        new_game.level.character.stages)
 
     new_game.next_bobble_index = math.random(#new_game.bobble_images)
     new_game:_set_up_game_rules()
