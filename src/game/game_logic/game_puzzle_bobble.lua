@@ -465,10 +465,13 @@ function game_puzzle_bobble:_get_current_line_of_dialogue()
 
     if self.cached_dialogue == nil or self.time_since_last_dialogue_update >= self.time_between_dialogue_updates then
 
+        local last_cached_line = self.cached_dialogue
+
         self.cached_dialogue = self.level.character:get_next_dialogue_line()
 
-        -- self.text_box:add_animation(animation:new(-1 * self.text_box:getWidth(), 20, data.game.game_time, 0.5, animation.scheme_linear_interpolate, "x"))
-
+        if self.cached_dialogue == last_cached_line then
+            return "SIG_KILL"
+        end
         self.time_since_last_dialogue_update = 0
     end
 
@@ -525,7 +528,14 @@ end
 
 function game_puzzle_bobble:_draw_dialogue(layer)
 
+
     if layer ~= render_layer.GAME_BG or self.started_playing_time == nil then return end
+
+    local line_of_dialogue = self:_get_current_line_of_dialogue()
+
+    if line_of_dialogue == "SIG_KILL" then
+        return
+    end
 
     local target_x = 20
     -- This function causes me pain   _:(´ཀ`」 ∠):
@@ -561,7 +571,6 @@ function game_puzzle_bobble:_draw_dialogue(layer)
     local offset_y = 30
     local max_width =  0.8 * self.text_box.image:getWidth()
     local font_scale = 1
-    local line_of_dialogue = self:_get_current_line_of_dialogue()
 
     love.graphics.setColor(data.color.COLOR_BLACK)
     love.graphics.printf(
