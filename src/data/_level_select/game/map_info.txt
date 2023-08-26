@@ -1,3 +1,4 @@
 texas=155 215
 tokyo=863 230
 delhi=710 260
+antarctica=750 560

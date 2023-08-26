@@ -108,7 +108,7 @@ function game_level_select:draw(layer)
     local s = self.selector_sprite
     if layer == render_layer.GAME_BG then
         love.graphics.setColor(data.color.COLOR_WHITE)
-        local max_width = 100
+        local max_width = 110
         local font_scale = 1.3
         local drop_shadow_offset = 1
 
@@ -125,6 +125,7 @@ function game_level_select:draw(layer)
             font_scale,
             max_width / 2,
             0)
+
         love.graphics.setColor(data.color.COLOR_BLACK)
         love.graphics.printf(
             self.level_data[self.currently_selected_index].title,

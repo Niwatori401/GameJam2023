@@ -1,3 +1,4 @@
 texas=TEXAS, U.S.A.
 tokyo=TOKYO, JAPAN
 delhi=NEW DELHI, INDIA
+antarctica=TUTORIAL, SOUTH POLE
