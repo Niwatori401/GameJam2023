@@ -36,7 +36,7 @@ function game_puzzle_bobble:new(game_data, level)
         new_game.level.character.stages)
 
     new_game.next_bobble_index = math.random(#new_game.bobble_images)
-    new_game:_set_up_game_rules()
+    new_game:_set_up_game_rules(game_data)
     new_game:_set_initial_bobble_rows()
     new_game:_make_shooter_sprites(game_data)
     new_game:_make_game_bg_sprite(game_data)
@@ -158,7 +158,7 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
 
     local visited = {}
 
-    for _ = 1, self.rows_per_game do
+    for _ = 1, #self.grid do
         table.insert(visited, {0, 0, 0, 0, 0, 0, 0, 0})
     end
 
@@ -182,7 +182,7 @@ function game_puzzle_bobble:_pop_connected_bobbles(bobble)
     end
 
     visited = {}
-    for _ = 1, self.rows_per_game do
+    for _ = 1, #self.grid do
         table.insert(visited, {0, 0, 0, 0, 0, 0, 0, 0})
     end
 
@@ -290,20 +290,37 @@ function game_puzzle_bobble:_convert_pixel_position_to_cell_index(pos_x, pos_y)
 end
 
 function game_puzzle_bobble:_set_initial_bobble_rows()
-    local rows_to_start_with = 3
+    local rows_to_start_with = self.rows_to_start_with
+
+    function table_shallow_copy(table_to_copy)
+        local new_table = {}
+
+        for key, value in pairs(table_to_copy) do
+            new_table[key] = value
+        end
+
+        return new_table
+    end
+
+
 
     for _ = 1, rows_to_start_with, 1 do
         table.insert(self.grid, self:_get_next_bobble_row())
     end
 
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
-    table.insert(self.grid, {0,0,0,0,0,0,0,0})
+    local blank_rows = {}
+    for _ = 1, self.bobbles_per_row, 1 do
+        table.insert(blank_rows, 0)
+    end
+
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
+    table.insert(self.grid, table_shallow_copy(blank_rows))
 end
 
 function game_puzzle_bobble:_add_rows_periodically(dt)
@@ -325,7 +342,7 @@ function game_puzzle_bobble:_add_rows_periodically(dt)
 end
 
 function game_puzzle_bobble:_trim_and_insert_bobble_row(new_row)
-    --self:_trim_zeroed_rows(self.grid)
+    self:_trim_extra_zeroed_rows(self.grid)
 
     for i = #self.grid, 1, -1 do
         self.grid[i + 1] = self.grid[i]
@@ -334,19 +351,22 @@ function game_puzzle_bobble:_trim_and_insert_bobble_row(new_row)
     self.grid[1] = new_row
 end
 
-function game_puzzle_bobble:_trim_zeroed_rows(array2D)
+function game_puzzle_bobble:_trim_extra_zeroed_rows(array2D)
 
     for i = #array2D, 1, -1 do
-        local isZeroRow = true
+        local is_zero_row = true
+        if i < self.rows_per_game * 1.5 then
+            return
+        end
 
         for _, value in ipairs(array2D[i]) do
             if value ~= 0 then
-                isZeroRow = false
+                is_zero_row = false
                 break
             end
         end
 
-        if isZeroRow then
+        if is_zero_row then
             table.remove(array2D, i)
         else
             return
@@ -354,8 +374,29 @@ function game_puzzle_bobble:_trim_zeroed_rows(array2D)
     end
 end
 
+
+function game_puzzle_bobble:_get_last_nonzero_row_index()
+    local row_has_nonzero_entry = false
+    for row_index, row in ipairs(self.grid) do
+        row_has_nonzero_entry = false
+
+        for entry_index, entry in ipairs(row) do
+            if entry ~= 0 then
+                row_has_nonzero_entry = true
+                break
+            end
+        end
+
+        if not row_has_nonzero_entry then
+           return row_index - 1
+        end
+    end
+
+    return #self.grid
+end
+
 function game_puzzle_bobble:_is_game_failure()
-    return #self.grid > self.rows_per_game
+    return self:_get_last_nonzero_row_index() >= self.rows_per_game
 end
 
 function game_puzzle_bobble:_get_next_bobble_row()
@@ -523,11 +564,17 @@ end
 
 --#region constructor helpers
 
-function game_puzzle_bobble:_set_up_game_rules()
-    self.bobbles_per_row = 8
-    self.rows_per_game = 15
+function game_puzzle_bobble:_set_up_game_rules(game_data)
+
+    local game_rules = utility.parse_info(game_data["game_rules"])
+
+    self.bobbles_per_row = tonumber(game_rules.bobbles_per_row)
+    self.rows_per_game = tonumber(game_rules.rows_to_lose)
     self.time_since_last_row = 0
-    self.time_to_next_row = 100
+    self.time_to_next_row = tonumber(game_rules.time_to_first_row)
+    self.decrease_per_row = tonumber(game_rules.decrease_in_time_per_row)
+    self.min_time_per_row = tonumber(game_rules.min_time_per_row)
+    self.rows_to_start_with = tonumber(game_rules.initial_rows)
     self.rotation_speed_multiplier = 1
 end
 
