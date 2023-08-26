@@ -1,12 +1,6 @@
-[6A] Upon reaching Stage 6.
-
-[1]-BELLY_SLOSH3.OGG + SKIRT_TEAR.OGG
-[2]<XL_BURP.OGG>
-[3]-Whew...
-[4]-You might just do it after all.
-[5]-Did you think I was done? That's disappointing.
-
-
+Whew...
+You might just do it after all.
+Did you think I was done? That's disappointing.
 *BUARP* - Hahaha! Think of that as your reward.
 Quit staring and keep feeding.
 More? Oh, yes, certainly.
