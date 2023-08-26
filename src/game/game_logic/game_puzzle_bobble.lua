@@ -25,9 +25,12 @@ function game_puzzle_bobble:new(game_data, level)
     new_game.time_since_last_dialogue_update = 0
     new_game.time_between_dialogue_updates = 5
     new_game.cached_dialogue = nil
+    new_game.game_over = false
+    new_game.winner = false
 
     new_game:_load_bobble_images(game_data)
     new_game:_load_food_images(game_data)
+    new_game:_make_win_scene_assets(game_data)
 
     new_game.thermometer = thermometer:new(
         sprite:new(game_data["thermometer_base"],
@@ -68,6 +71,8 @@ end
 
 function game_puzzle_bobble:update(dt)
 
+    if self.game_over_win then return end
+
     self.thermometer:update(dt)
 
     for _, a in pairs(self.text_box.animations) do
@@ -93,15 +98,25 @@ function game_puzzle_bobble:update(dt)
                 love.audio.play(self.audio.pop_1)
             end
 
-
             self.current_bobble = nil
             self.next_bobble_index = math.random(#self.bobble_images)
             self.level:add_points(popped_count * self.points_per_bobble)
             self.thermometer:add_amount_to_current(popped_count * self.points_per_bobble)
 
             if self:_is_game_failure() then
-                self.level.exit_status = "game_failure"
-                self.level:transition_out()
+
+                if self.level.character:get_cur_image_stage_index() == #self.level.character.stages then
+                    self.game_over_win = true
+                    love.audio.stop()
+                    love.audio.play(self.win_sound)
+                    self.action_set:add_key_action("escape", function (game)
+                        game.level.exit_status = "game_success"
+                        game.level:transition_out()
+                    end)
+                else
+                    self.level.exit_status = "game_failure"
+                    self.level:transition_out()
+                end
             end
         end
         if self.current_bobble ~= nil then
@@ -130,6 +145,10 @@ function game_puzzle_bobble:draw(layer)
     --self:_draw_upper_bar(layer)
 
     self.thermometer:draw()
+
+    if self.game_over_win then
+        self:_draw_winner_screen()
+    end
 end
 
 function game_puzzle_bobble:handle_events(key)
@@ -482,6 +501,13 @@ end
 --#endregion
 
 --#region drawing helper fucntion
+
+function game_puzzle_bobble:_draw_winner_screen()
+    love.graphics.setColor(data.color.COLOR_WHITE)
+
+    love.graphics.draw(self.win_screen, 0, 0, 0, data.window.SCREEN_X / self.win_screen:getWidth(), data.window.SCREEN_Y / self.win_screen:getHeight())
+
+end
 
 function game_puzzle_bobble:_draw_score_and_box(layer)
     if layer ~= render_layer.GAME_BG then
@@ -923,6 +949,11 @@ function game_puzzle_bobble:_load_food_images(game_data)
     end
 end
 
+function game_puzzle_bobble:_make_win_scene_assets(game_data)
+
+    self.win_sound = game_data["victory"]
+    self.win_screen = game_data["win"]
+end
 
 function game_puzzle_bobble:_define_level_release_actions()
     self.action_release_set = action_set:new()
