@@ -49,16 +49,6 @@ end
 
 function game_splash:draw(layer)
 
-    -- if layer == render_layer.STAGE_BG then
-    --     love.graphics.setColor(data.color.COLOR_WHITE)
-    --     love.graphics.draw(
-    --         self.background,
-    --         0,
-    --         0,
-    --         0,
-    --         data.window.SCREEN_X / self.background:getWidth(),
-    --         data.window.SCREEN_Y / self.background:getHeight())
-    -- end
 end
 
 function game_splash:handle_events(key)

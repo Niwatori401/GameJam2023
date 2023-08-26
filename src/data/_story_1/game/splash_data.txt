@@ -1,0 +1,2 @@
+duration=120
+next_level=_level_select

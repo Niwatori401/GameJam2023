@@ -45,7 +45,9 @@ function sprite_renderer:render()
     -- 8
     level_manager.cur_level.game:draw(render_layer.BOBBLES)
     -- 9
+    level_manager.cur_level.game:draw(render_layer.EFFECTS)
     level_manager.cur_level.stage:draw(render_layer.EFFECTS)
+
 
 end
 
