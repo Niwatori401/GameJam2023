@@ -13,7 +13,7 @@ function love.load()
     data:init()
     data.game.machine = machine
     machine:init("base")
-    machine:transition_state(request:new(nil, "abort_level", nil))
+    machine:transition_state(request:new(nil, "unconditional_load", {level_to_load = "_splash_screen"}))
     sprite_renderer:init()
 
     love.graphics.setFont(data.font.fonts["ArchitectsDaughter"])
