@@ -502,6 +502,7 @@ function game_puzzle_bobble:_draw_dialogue(layer)
     if layer ~= render_layer.GAME_BG or self.started_playing_time == nil then return end
 
     local target_x = 20
+    -- This function causes me pain   _:(´ཀ`」 ∠):
     local should_show_textbox = self:_should_show_text_box()
     if self.did_entry and not should_show_textbox then
 
