@@ -31,6 +31,7 @@ function game_puzzle_bobble:new(game_data, level)
         render_layer.GAME_BG,
         0,
         data.color.COLOR_WHITE),
+        game_data["thermometer_back"],
         new_game.level.character.points,
         data.color.BERY_NICE_PINK,
         new_game.level.character.stages)
@@ -83,13 +84,15 @@ end
 
 
 function game_puzzle_bobble:draw(layer)
-
+    self:_draw_game_background(layer)
     self:_draw_game_bg(layer)
+    self:_draw_box_under_shooter(layer)
+    self:_draw_fail_line(layer)
     self:_draw_arrow_and_base(layer)
     self:_draw_bobbles(layer)
     self:_draw_next_bobble(layer)
-    self:_draw_upper_bar(layer)
-    self:_draw_fail_line(layer)
+    --self:_draw_upper_bar(layer)
+
     self.thermometer:draw()
 end
 
@@ -424,6 +427,32 @@ end
 
 --#region drawing helper fucntion
 
+function game_puzzle_bobble:_draw_box_under_shooter(layer)
+    if layer == render_layer.GAME_BG then
+        love.graphics.setColor(data.color.COLOR_DARK_GRAY)
+        local y_coord = self.game_y + (self.rows_per_game) * (self.game_width / self.bobbles_per_row)
+        love.graphics.rectangle(
+            "fill",
+            self.game_x,
+            y_coord,
+            self.game_width,
+            self.game_height - y_coord + self.game_y)
+    end
+end
+
+function game_puzzle_bobble:_draw_game_background(layer)
+    if layer == render_layer.GAME_BG then
+        local outline_size = 4
+        love.graphics.setColor(data.color.COLOR_GRAY)
+        love.graphics.rectangle(
+            "fill",
+            self.game_x - outline_size,
+            self.game_y - outline_size,
+            self.game_width + 2 * outline_size,
+            self.game_height + 2 * outline_size)
+    end
+end
+
 function game_puzzle_bobble:_draw_game_bg(layer)
     local s = self.game_bg
 
@@ -474,7 +503,12 @@ function game_puzzle_bobble:_draw_fail_line(layer)
 
     if layer == render_layer.GAME_BG then
         love.graphics.setColor(data.color.COLOR_DARK_RED)
-        love.graphics.rectangle("fill", self.game_x, self.game_y + (self.rows_per_game) * (self.game_width / self.bobbles_per_row), self.game_width, 3)
+        love.graphics.rectangle(
+            "fill",
+            self.game_x,
+            self.game_y + (self.rows_per_game) * (self.game_width / self.bobbles_per_row),
+            self.game_width,
+            3)
     end
 
 end
@@ -601,6 +635,7 @@ function game_puzzle_bobble:_set_up_game_rules(game_data)
     self.min_time_per_row = tonumber(game_rules.min_time_per_row)
     self.rows_to_start_with = tonumber(game_rules.initial_rows)
     self.points_per_bobble = tonumber(game_rules.points_per_bobble)
+    self.bobble_speed = tonumber(game_rules.bobble_speed)
     self.rotation_speed_multiplier = 1
 end
 
@@ -644,13 +679,8 @@ function game_puzzle_bobble:_define_level_release_actions()
     self.action_release_set = action_set:new()
 
     self.action_release_set:add_key_action("lshift", function (game)
-
         game.rotation_speed_multiplier = 1
-
     end)
-
-
-
 end
 
 
@@ -697,7 +727,7 @@ function game_puzzle_bobble:_define_level_actions()
 
         local bobble_index = game.next_bobble_index
         game.next_bobble_index = nil
-        local total_velocity = 750
+        local total_velocity = game.bobble_speed
 
         local velocity_x = total_velocity * math.sin(game.arrow_sprite.rotation)
         local velocity_y = total_velocity * math.cos(game.arrow_sprite.rotation)

@@ -3,11 +3,11 @@ local animation = require("graphic.animation")
 
 local thermometer = {}
 
-function thermometer:new(sprite, current_amount, color, stages)
+function thermometer:new(sprite, background_image, current_amount, color, stages)
 
     local new_therm = setmetatable({}, {__index = thermometer})
 
-
+    self.background_image = background_image
     self.lowest_point_amount = stages[1] - 10
     self.sprite = sprite
     self.fluid_color = color
@@ -19,6 +19,15 @@ function thermometer:new(sprite, current_amount, color, stages)
 end
 
 function thermometer:draw(layer)
+    -- Thermometer background
+    love.graphics.setColor(self.sprite.color)
+    love.graphics.draw(
+        self.background_image,
+        self.sprite.x,
+        self.sprite.y,
+        0,
+        self.sprite.x_scale,
+        self.sprite.y_scale)
 
     -- circle at base
     local circle_center_x = self.sprite.x + 64 * self.sprite.x_scale
