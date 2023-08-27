@@ -26,6 +26,8 @@ function game_tutorial:new(game_data, level)
     new_game.time_since_last_dialogue_update = 0
     new_game.time_between_dialogue_updates = 5
     new_game.cached_dialogue = nil
+    new_game.game_over = false
+    new_game.winner = false
 
     new_game:_load_bobble_images(game_data)
     new_game:_load_food_images(game_data)
@@ -55,7 +57,7 @@ function game_tutorial:new(game_data, level)
     new_game:_make_audio_fx(game_data)
     new_game:_make_shooter_sprites(game_data)
     new_game:_make_game_bg_sprite(game_data)
-
+    new_game:_make_win_scene_assets(game_data)
     new_game:_define_level_actions()
     new_game:_define_level_inputs()
     new_game:_define_level_release_actions()
